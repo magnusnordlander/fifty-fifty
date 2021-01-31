@@ -15,13 +15,17 @@ This project is in use and development.
 
 This is an Arduino based grinder controller for my Mazzer Major. It has a display and is controlled by a rotary encoder. It also contains a PCB schematic.
 
-## Parts (overview)
+## Parts
 
-* Arduino Nano 33 IoT
-* An SSR for controlling the grinder (not mounted on the PCB, it's strictly low voltage)
+* [Arduino Nano 33 IoT](https://www.electrokit.com/en/product/arduino-nano-33-iot-with-headers/)
+* A Solid-state relay
+  * I'm using a [Fotek SSR-40 DA clone](https://www.electrokit.com/en/product/solid-state-relay-3-32v-40a/), because that's what came with my used grinder when I bought it
+  * If you want a more high-quality component, a [Crydom-Sensata 84137000](http://www.crydom.com/en/products/catalog/gnssr.pdf) would be a good choice
 * A power supply in the range of 3.3-20 V capable of driving both the Arduino and the SSR
-* A rotary encoder (I used https://www.m.nu/knappar/rotary-encoder-20p-v-with-switch-breakout-board and the pinout on PCB matches this)
-* An I2C controlled OLED (I used https://www.olimex.com/Products/Modules/LCD/MOD-OLED-128x64/open-source-hardware, and the pinout on the PCB matches this)
+  * I'm using a no-name 9V power supply that came with my used grinder
+  * A good choice for buying would be something like the [Mean-Well IRM-20-12](https://www.electrokit.com/en/product/switchad-stromforsorjning-20w-12v-2/)
+* A [KY-040 style rotary encoder](https://www.electrokit.com/en/product/rotary-encoder-module/)
+* An [SSD1306 compatible, I2C connected, 3.3V, 128x64 px OLED, preferably (but not necessarily) connected via UEXT](https://www.electrokit.com/en/product/lcd-oled-0-96-128-x-64px-uext-2/)
 
 
 ## Rev A BOM
