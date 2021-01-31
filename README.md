@@ -30,4 +30,19 @@ This is an Arduino based grinder controller for my Mazzer Major. It has a displa
 
 ## Rev A BOM
 
-TBD
+* 1 x [DIL socket 32 pin (remove 2 pins)](https://www.electrokit.com/en/product/dil-socket-32-pin/)
+* 1 x [3 mm LED, 2.15 V forward voltage, 20mA](https://www.electrokit.com/en/product/led-red-3-mm-500-mcd-clear/)
+* 1 x [100Ω resistor, R1 (or another resistor appropriate for the LED you're using), incorrectly labled as 1K on the PCB](https://www.electrokit.com/en/product/resistor-metal-film-0-6w-1-100ohm-100r/)
+* 1 x [1kΩ resistor, R2](https://www.electrokit.com/en/product/resistor-metal-film-0-6w-1-1kohm-1k/)
+* 1 x [IRLZ44NPBF TO-220 N-ch 55V 47A MOSFET, incorrectly labeled as IRF520 on the PCB](https://www.electrokit.com/en/product/irlz44npbf-to-220-n-ch-55v-47a-2/)
+* 1 x [PCB pin header 5.08mm 6-pole right-angle](https://www.electrokit.com/en/product/pcb-hane-5-08mm-6-pol-vinklad/)
+* 1 x [IDC box header PCB 10-p 2.54mm](https://www.electrokit.com/en/product/idc-box-header-pcb-10-p-2-54mm/)
+* 1 x [5 pin 2.43mm pin header](https://www.electrokit.com/en/product/pin-header-2-54mm-1x40p-red/)
+
+## Anything else?
+
+While not technically part of the board, you'll probably want some other things to make it all work:
+
+* 1 x [Screw terminal pluggable 5.08mm 6-pole](https://www.electrokit.com/en/product/skruvplint-pluggbar-5-08mm-6-pol/)
+* 1 x 10 pin IDC flat cable
+* 1 x 5 pin jumper wires
