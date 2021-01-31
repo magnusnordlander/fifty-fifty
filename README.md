@@ -30,7 +30,7 @@ This is an Arduino based grinder controller for my Mazzer Major. It has a displa
 
 ## Rev A BOM
 
-* 1 x [DIL socket 32 pin (remove 2 pins)](https://www.electrokit.com/en/product/dil-socket-32-pin/)
+* 1 x [DIL socket 32 pin (remove 2 pins, optional but recommended)](https://www.electrokit.com/en/product/dil-socket-32-pin/)
 * 1 x [3 mm LED, 2.15 V forward voltage, 20mA](https://www.electrokit.com/en/product/led-red-3-mm-500-mcd-clear/)
 * 1 x [100Ω resistor, R1 (or another resistor appropriate for the LED you're using), incorrectly labled as 1K on the PCB](https://www.electrokit.com/en/product/resistor-metal-film-0-6w-1-100ohm-100r/)
 * 1 x [1kΩ resistor, R2](https://www.electrokit.com/en/product/resistor-metal-film-0-6w-1-1kohm-1k/)
