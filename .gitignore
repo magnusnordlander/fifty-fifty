@@ -1,2 +1,5 @@
 .DS_Store
-fp-info-cache
+.pio
+CMakeListsPrivate.txt
+cmake-build-*/ 
+.idea
