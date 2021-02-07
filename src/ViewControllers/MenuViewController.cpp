@@ -15,13 +15,39 @@ void MenuViewController::render(U8G2 display) {
     display.setDrawColor(2);
     display.setFont(u8g2_font_ncenB08_tr);
 
-    display.drawBox(0, 2+(this->currentSelection*MENU_ROW_HEIGHT), 128, 16);
+    unsigned int numMenuItems = this->menuItems.size();
+
+    unsigned short boxWidth = 128;
+    if (numMenuItems > 4) {
+        boxWidth = 122;
+    }
+
+    display.drawBox(0, this->translateYCoordinate(2+(this->currentSelection*MENU_ROW_HEIGHT)), boxWidth, 16);
 
     for (size_t i = 0; i < this->menuItems.size(); ++i) {
-        display.drawStr(8, (i+1)*MENU_ROW_HEIGHT, this->menuItems[i]->getName().c_str());
+        display.drawStr(8, this->translateYCoordinate((i+1)*MENU_ROW_HEIGHT), this->menuItems[i]->getName().c_str());
+    }
+
+    if (numMenuItems > 4) {
+        display.setDrawColor(1);
+
+        auto scrollBarHeight = (unsigned int)(64. * (4. / (float)numMenuItems));
+        auto scrollBarNega = (float)(64 - scrollBarHeight);
+        float factor = (float)this->currentSelection / (float)(numMenuItems - 1);
+        auto scrollBarY = (unsigned int)(scrollBarNega * factor);
+
+        display.drawRBox(124, scrollBarY, 4, scrollBarHeight, 1);
     }
 
     display.sendBuffer();
+}
+
+unsigned short MenuViewController::translateYCoordinate(unsigned short coordinate) const {
+    if ((this->currentSelection+1)*MENU_ROW_HEIGHT < MENU_ROW_HEIGHT*3) {
+        return coordinate;
+    }
+
+    return coordinate - (this->currentSelection-2)*MENU_ROW_HEIGHT;
 }
 
 MenuViewController::MenuViewController(std::vector<MenuItem*> items) {

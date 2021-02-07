@@ -21,6 +21,8 @@ public:
     void viewWillBePopped(NavigationController *controller) override;
 
 private:
+    unsigned short translateYCoordinate(unsigned short coordinate) const;
+
     std::vector<MenuItem*> menuItems;
 
     unsigned short currentSelection = 0;
