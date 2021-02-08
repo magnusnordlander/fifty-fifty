@@ -27,7 +27,7 @@ void PurgeViewController::viewWillBePopped(NavigationController *controller) {
 PurgeViewController::PurgeViewController(SsrState *ssr, Settings *settings) : BaseGrindViewController(ssr),
                                                                               settings(settings) {}
 void PurgeViewController::render(U8G2 display) {
-    display.clearBuffer();          // clear the internal memory
+              // clear the internal memory
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
     display.setDrawColor(2);
@@ -50,5 +50,5 @@ void PurgeViewController::render(U8G2 display) {
         display.drawStr(100, 32, "s");
     }
 
-    display.sendBuffer();
+
 }

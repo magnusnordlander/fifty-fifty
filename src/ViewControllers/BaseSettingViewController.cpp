@@ -4,12 +4,10 @@
 
 #include "BaseSettingViewController.h"
 
-
-#define SETTING_SENSITIVITY 4
 #define ENCODER_SW_DEAD_TIME 200
 
 void BaseSettingViewController::handleRotation(int encoderDiff) {
-    int amplified_encoder_diff = encoderDiff * SETTING_SENSITIVITY;
+    int amplified_encoder_diff = encoderDiff * this->settingSensitivity;
 
     if (amplified_encoder_diff != 0) {
         if (this->target + amplified_encoder_diff > USHRT_MAX) {

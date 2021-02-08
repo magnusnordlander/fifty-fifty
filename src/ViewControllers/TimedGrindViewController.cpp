@@ -27,7 +27,6 @@ void TimedGrindViewController::viewWillBePopped(NavigationController *controller
 TimedGrindViewController::TimedGrindViewController(SsrState *ssr, Settings *settings) : BaseGrindViewController(ssr),
                                                                               settings(settings) {}
 void TimedGrindViewController::render(U8G2 display) {
-    display.clearBuffer();          // clear the internal memory
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
     display.setDrawColor(2);
@@ -50,5 +49,5 @@ void TimedGrindViewController::render(U8G2 display) {
         display.drawStr(100, 32, "s");
     }
 
-    display.sendBuffer();
+
 }

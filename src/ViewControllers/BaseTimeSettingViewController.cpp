@@ -5,7 +5,7 @@
 #include "BaseTimeSettingViewController.h"
 
 void BaseTimeSettingViewController::render(U8G2 display) {
-    display.clearBuffer();
+
 
     char purge_string[25];
     float target_s = (float)this->target/1000;
@@ -22,5 +22,5 @@ void BaseTimeSettingViewController::render(U8G2 display) {
     snprintf(target_weight_string, sizeof(target_weight_string), "Approx. %d.%02d g", (int)Target_Weight_G, (int)(Target_Weight_G*100)%100);
     display.drawStr(0, 56, target_weight_string);
 
-    display.sendBuffer();
+
 }

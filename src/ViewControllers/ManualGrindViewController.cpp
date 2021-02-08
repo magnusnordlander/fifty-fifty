@@ -5,7 +5,7 @@
 #include "ManualGrindViewController.h"
 
 void ManualGrindViewController::render(U8G2 display) {
-    display.clearBuffer();
+
     display.setFontMode(1);
     display.setDrawColor(2);
 
@@ -26,5 +26,5 @@ void ManualGrindViewController::render(U8G2 display) {
         display.drawStr(100, 32, "s");
     }
 
-    display.sendBuffer();
+
 }

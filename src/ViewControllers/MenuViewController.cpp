@@ -10,7 +10,7 @@
 #define ENCODER_SW_DEAD_TIME 200
 
 void MenuViewController::render(U8G2 display) {
-    display.clearBuffer();
+
     display.setFontMode(1);
     display.setDrawColor(2);
     display.setFont(u8g2_font_ncenB08_tr);
@@ -39,7 +39,7 @@ void MenuViewController::render(U8G2 display) {
         display.drawRBox(124, scrollBarY, 4, scrollBarHeight, 1);
     }
 
-    display.sendBuffer();
+
 }
 
 unsigned short MenuViewController::translateYCoordinate(unsigned short coordinate) const {

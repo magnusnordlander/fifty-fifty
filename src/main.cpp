@@ -1,13 +1,15 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include <Wire.h>
-#include <FlashAsEEPROM.h>
 #include <Encoder.h>
+#include <avr/dtostrf.h>
 #include "NavigationController.h"
 #include "ViewControllers/MenuViewController.h"
 #include "ViewControllers/ManualGrindViewController.h"
 #include "ViewControllers/PurgeTimeSettingViewController.h"
 #include "ViewControllers/GrindTimeSettingViewController.h"
+#include "ViewControllers/GrindTargetWeightSettingViewController.h"
+#include "ViewControllers/GravimetricGrindViewController.h"
 #include "ViewControllers/ProductivitySettingViewController.h"
 #include "ViewControllers/PurgeViewController.h"
 #include "ViewControllers/TimedGrindViewController.h"
@@ -15,13 +17,17 @@
 #include "MenuItem/PopNavigationAndCommitEEPROMMenuItem.h"
 #include "MenuItem/PurgeMenuItem.h"
 #include "MenuItem/GrindMenuItem.h"
+#include "MenuItem/GrindByWeightMenuItem.h"
 #include "Settings.h"
+#include "ScaleWrapper.h"
 
 const int Encoder_SW_Pin = 4;
 const int Encoder_DT_Pin = 3; // Must be interrupt pin
 const int Encoder_CLK_Pin = 2; // Must be interrupt pin
 const int Manual_Grind_Pin = 14;
 const int Ssr_Pin = 15;
+const int Scale_DOUT_Pin = 5;
+const int Scale_CLK_Pin = 6;
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
@@ -33,12 +39,13 @@ long Old_Encoder_Position  = 0;
 
 Encoder myEnc(Encoder_DT_Pin, Encoder_CLK_Pin);
 
+ScaleWrapper* scale;
 SsrState* ssr = nullptr;
 ManualGrindViewController* manualGrindView = nullptr;
 NavigationController* nav = nullptr;
 
 void setup(void) {
-    delay(1000);
+//    delay(1000);
 
     pinMode(Manual_Grind_Pin, INPUT_PULLUP);
     pinMode(Encoder_SW_Pin, INPUT_PULLUP);
@@ -47,20 +54,26 @@ void setup(void) {
     Serial.begin(9600);
 
     ssr = new SsrState(Ssr_Pin);
-    auto settings = new Settings(&EEPROM);
+    auto settings = new Settings();
+
+    scale = new ScaleWrapper(Scale_DOUT_Pin, Scale_CLK_Pin, settings);
+//    scale->tare();
 
     manualGrindView = new ManualGrindViewController(ssr);
 
     auto settingsMenu = new MenuViewController(std::vector<MenuItem*> {{
             new ViewControllerMenuItem("Purge time", new PurgeTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Grind time", new GrindTimeSettingViewController(settings)),
+            new ViewControllerMenuItem("Target weight", new GrindTargetWeightSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
+            //new ViewControllerMenuItem("Calibrate (100 g)", new GrindTargetWeightSettingViewController(settings)),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 
     auto mainMenu = new MenuViewController(std::vector<MenuItem*> {{
             new PurgeMenuItem(new PurgeViewController(ssr, settings), settings),
             new GrindMenuItem(new TimedGrindViewController(ssr, settings), settings),
+            new GrindByWeightMenuItem(new GravimetricGrindViewController(ssr, scale, settings), settings),
             new ViewControllerMenuItem("Settings...", settingsMenu),
     }});
 
@@ -78,6 +91,7 @@ void updateExternalState() {
     Encoder_SW_State = digitalRead(Encoder_SW_Pin);
     Manual_Grind_State = digitalRead(Manual_Grind_Pin);
 
+    scale->refresh();
 }
 
 void loop(void) {
@@ -100,5 +114,9 @@ void loop(void) {
 
     nav->top()->tick();
 
+    u8g2.clearBuffer();
+
     nav->top()->render(u8g2);
+
+    u8g2.sendBuffer();
 }

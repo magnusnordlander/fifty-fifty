@@ -5,7 +5,7 @@
 #include "ProductivitySettingViewController.h"
 
 void ProductivitySettingViewController::render(U8G2 display) {
-    display.clearBuffer();
+
 
     char productivity_string[25];
     float Productivity_S = (float)this->target/1000;
@@ -14,7 +14,7 @@ void ProductivitySettingViewController::render(U8G2 display) {
     display.setFont(u8g2_font_logisoso24_tr); // choose a suitable font
     display.drawStr(8,42,productivity_string);
 
-    display.sendBuffer();
+
 }
 
 unsigned short ProductivitySettingViewController::getTargetFromSettings() {

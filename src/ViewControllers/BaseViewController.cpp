@@ -5,10 +5,9 @@
 #include "BaseViewController.h"
 
 void BaseViewController::render(U8G2 display) {
-    display.clearBuffer();
     display.setFont(u8g2_font_ncenB08_tr);
     display.drawStr(16, 16, "Override me");
-    display.sendBuffer();
+
 }
 
 void BaseViewController::handleRotation(int encoderDiff) {

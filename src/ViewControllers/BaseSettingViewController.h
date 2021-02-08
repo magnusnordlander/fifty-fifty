@@ -25,6 +25,8 @@ protected:
 
     Settings* settings;
     unsigned short target;
+
+    unsigned short settingSensitivity = 4;
 };
 
 
