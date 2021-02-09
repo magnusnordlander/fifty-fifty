@@ -24,6 +24,8 @@ void GravimetricGrindViewController::tick(U8G2 display) {
     } else {
         this->ssr->enable();
 
+        this->redraw(display);
+
         if (this->scale->getReactionCompensatedLatestValue(REACTION_TIME_MICROS)*1000 >= (float)(this->target_mg)) {
             this->navigationController->pop();
         }
