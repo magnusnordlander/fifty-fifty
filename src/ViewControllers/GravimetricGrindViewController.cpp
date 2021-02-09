@@ -5,7 +5,7 @@
 #include "GravimetricGrindViewController.h"
 #include <avr/dtostrf.h>
 
-#define REACTION_TIME_MICROS 100000
+#define REACTION_TIME_MICROS 200000
 
 GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
                                                                Settings *settings) : BaseGrindViewController(ssr) {
