@@ -14,7 +14,7 @@ public:
     GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
                                    Settings *settings);
 
-    void tick() override;
+    void tick(U8G2 display) override;
 
     void viewWasPushed(NavigationController *controller) override;
 
@@ -22,7 +22,9 @@ public:
 
     void render(U8G2 display) override;
 
-protected:
+private:
+    void renderTaringView(U8G2 display);
+
     Settings* settings;
     ScaleWrapper* scale;
 

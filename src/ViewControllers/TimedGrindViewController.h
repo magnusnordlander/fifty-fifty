@@ -12,7 +12,7 @@ class TimedGrindViewController: public BaseGrindViewController {
 public:
     TimedGrindViewController(SsrState *ssr, Settings *settings);
 
-    void tick() override;
+    void tick(U8G2 display) override;
 
     void viewWasPushed(NavigationController *controller) override;
 

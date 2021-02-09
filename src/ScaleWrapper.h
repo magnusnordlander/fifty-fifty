@@ -5,8 +5,14 @@
 #ifndef GRINDER_SCALEWRAPPER_H
 #define GRINDER_SCALEWRAPPER_H
 
+#include <deque>
 #include <HX711.h>
 #include "Settings.h"
+
+typedef struct {
+    float measuringPoint;
+    unsigned long microtime;
+} MeasuringPoint;
 
 class ScaleWrapper {
 public:
@@ -18,9 +24,13 @@ public:
     void setRefreshing(bool refreshing);
 
     float getLatestValue() const;
+    float getRateOfChange();
 
+    float getReactionCompensatedLatestValue(unsigned long reactionTimeMicros);
 private:
     float latestValue = 0;
+
+    std::deque<MeasuringPoint>* latestValues;
 
     Settings* settings;
     HX711 scale;

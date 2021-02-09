@@ -5,19 +5,26 @@
 #include "GravimetricGrindViewController.h"
 #include <avr/dtostrf.h>
 
+#define REACTION_TIME_MICROS 500000
+
 GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
                                                                Settings *settings) : BaseGrindViewController(ssr) {
     this->scale = scale;
     this->settings = settings;
 }
 
-void GravimetricGrindViewController::tick() {
-    BaseViewController::tick();
+void GravimetricGrindViewController::tick(U8G2 display) {
+    if (!this->tared) {
+        display.clearBuffer();
+        this->renderTaringView(display);
+        display.sendBuffer();
 
-    if (this->tared) {
+        scale->tare(10);
+        this->tared = true;
+    } else {
         this->ssr->enable();
 
-        if (this->scale->getLatestValue()*1000 >= (float)(this->target_mg)) {
+        if (this->scale->getReactionCompensatedLatestValue(REACTION_TIME_MICROS)*1000 >= (float)(this->target_mg)) {
             this->navigationController->pop();
         }
     }
@@ -40,17 +47,6 @@ void GravimetricGrindViewController::viewWillBePopped(NavigationController *cont
 }
 
 void GravimetricGrindViewController::render(U8G2 display) {
-    if (!this->tared) {
-        display.setFont(u8g2_font_helvB12_te);
-        display.drawStr(32,36, "Taring...");
-
-        display.sendBuffer();
-
-        scale->tare(10);
-        this->tared = true;
-        return;
-    }
-
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
     display.setDrawColor(2);
@@ -72,4 +68,9 @@ void GravimetricGrindViewController::render(U8G2 display) {
         display.drawStr(24,32,time_string);
         display.drawStr(100, 32, "g");
     }
+}
+
+void GravimetricGrindViewController::renderTaringView(U8G2 display) {
+    display.setFont(u8g2_font_helvB12_te);
+    display.drawStr(32,36, "Taring...");
 }

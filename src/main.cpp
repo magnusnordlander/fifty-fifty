@@ -57,7 +57,10 @@ void setup(void) {
     auto settings = new Settings();
 
     scale = new ScaleWrapper(Scale_DOUT_Pin, Scale_CLK_Pin, settings);
-//    scale->tare();
+/*
+    scale->setRefreshing(true);
+    scale->tare();
+*/
 
     manualGrindView = new ManualGrindViewController(ssr);
 
@@ -95,6 +98,8 @@ void updateExternalState() {
 }
 
 void loop(void) {
+//    Serial.println(scale->getReactionCompensatedLatestValue(500000));
+
     BaseViewController* top = nav->top();
 
     updateExternalState();
@@ -112,11 +117,5 @@ void loop(void) {
 
     nav->top()->handleButtonState(Encoder_SW_State == LOW);
 
-    nav->top()->tick();
-
-    u8g2.clearBuffer();
-
-    nav->top()->render(u8g2);
-
-    u8g2.sendBuffer();
+    nav->top()->tick(u8g2);
 }

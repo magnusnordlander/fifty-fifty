@@ -4,8 +4,8 @@
 
 #include "TimedGrindViewController.h"
 
-void TimedGrindViewController::tick() {
-    BaseViewController::tick();
+void TimedGrindViewController::tick(U8G2 display) {
+    BaseViewController::tick(display);
 
     if (this->elapsedMillis() >= this->target_ms) {
         this->navigationController->pop();
