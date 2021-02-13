@@ -6,13 +6,15 @@
 #include "NavigationController.h"
 #include "ViewControllers/MenuViewController.h"
 #include "ViewControllers/ManualGrindViewController.h"
-#include "ViewControllers/PurgeTimeSettingViewController.h"
-#include "ViewControllers/GrindTimeSettingViewController.h"
-#include "ViewControllers/GrindTargetWeightSettingViewController.h"
+#include "ViewControllers/Settings/PurgeTimeSettingViewController.h"
+#include "ViewControllers/Settings/GrindTimeSettingViewController.h"
+#include "ViewControllers/Settings/GrindTargetWeightSettingViewController.h"
 #include "ViewControllers/GravimetricGrindViewController.h"
-#include "ViewControllers/ProductivitySettingViewController.h"
+#include "ViewControllers/Settings/ProductivitySettingViewController.h"
+#include "ViewControllers/Settings/CalibrationViewController.h"
 #include "ViewControllers/PurgeViewController.h"
 #include "ViewControllers/TimedGrindViewController.h"
+#include "ViewControllers/ScaleViewController.h"
 #include "MenuItem/ViewControllerMenuItem.h"
 #include "MenuItem/PopNavigationAndCommitEEPROMMenuItem.h"
 #include "MenuItem/PurgeMenuItem.h"
@@ -26,8 +28,8 @@ const int Encoder_DT_Pin = 3; // Must be interrupt pin
 const int Encoder_CLK_Pin = 2; // Must be interrupt pin
 const int Manual_Grind_Pin = 14;
 const int Ssr_Pin = 15;
-const int Scale_DOUT_Pin = 5;
-const int Scale_CLK_Pin = 6;
+const int Scale_DOUT_Pin = 9;
+const int Scale_CLK_Pin = 10;
 
 U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
 
@@ -56,11 +58,7 @@ void setup(void) {
     ssr = new SsrState(Ssr_Pin);
     auto settings = new Settings();
 
-    scale = new ScaleWrapper(Scale_DOUT_Pin, Scale_CLK_Pin, settings);
-/*
-    scale->setRefreshing(true);
-    scale->tare();
-*/
+    scale = ScaleWrapper::GetInstance(Scale_DOUT_Pin, Scale_CLK_Pin, settings);
 
     manualGrindView = new ManualGrindViewController(ssr);
 
@@ -69,7 +67,7 @@ void setup(void) {
             new ViewControllerMenuItem("Grind time", new GrindTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Target weight", new GrindTargetWeightSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
-            //new ViewControllerMenuItem("Calibrate (100 g)", new GrindTargetWeightSettingViewController(settings)),
+            new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 
@@ -77,6 +75,7 @@ void setup(void) {
             new PurgeMenuItem(new PurgeViewController(ssr, settings), settings),
             new GrindMenuItem(new TimedGrindViewController(ssr, settings), settings),
             new GrindByWeightMenuItem(new GravimetricGrindViewController(ssr, scale, settings), settings),
+            new ViewControllerMenuItem("Scale", new ScaleViewController(scale)),
             new ViewControllerMenuItem("Settings...", settingsMenu),
     }});
 
@@ -98,7 +97,7 @@ void updateExternalState() {
 }
 
 void loop(void) {
-//    Serial.println(scale->getReactionCompensatedLatestValue(500000));
+    //Serial.println(scale->getLatestValue());
 
     BaseViewController* top = nav->top();
 

@@ -6,7 +6,7 @@
 #define GRINDER_SCALEWRAPPER_H
 
 #include <deque>
-#include <HX711.h>
+#include <HX711_ADC.h>
 #include "Settings.h"
 
 typedef struct {
@@ -15,27 +15,37 @@ typedef struct {
 } MeasuringPoint;
 
 class ScaleWrapper {
+protected:
+    ScaleWrapper(unsigned short doutPin, unsigned short clkPin, Settings* settings);
+
+    static ScaleWrapper* singleton_;
+
 public:
-    explicit ScaleWrapper(unsigned short doutPin, unsigned short clkPin, Settings* settings);
+    static ScaleWrapper *GetInstance(unsigned short doutPin, unsigned short clkPin, Settings* settings);
 
-    void refresh(unsigned short times = 1);
-    void tare(unsigned short times = 10);
+    void refresh();
+    void tare();
+    void tareNoDelay();
+    bool getTareStatus();
 
-    void setRefreshing(bool refreshing);
+    void setAccurateMode(bool accurateMode);
+    bool accuracyBufferFull();
+    void clearAccuracyBuffer();
+    float measureCalibrationValue(float knownMass);
 
     float getLatestValue() const;
     float getRateOfChange();
 
-    float getReactionCompensatedLatestValue(unsigned long reactionTimeMicros);
+    float getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);
+
+    static void dataReadyISR();
 private:
-    float latestValue = 0;
+    Settings* settings;
+    HX711_ADC* scale;
+
+    volatile static boolean newDataReady;
 
     std::deque<MeasuringPoint>* latestValues;
-
-    Settings* settings;
-    HX711 scale;
-
-    bool refreshing = false;
 };
 
 

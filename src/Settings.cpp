@@ -56,7 +56,8 @@ Settings::Settings() {
                 .purgeTargetTime = 1000,
                 .grindTargetWeight = 16000,
                 .productivity = 2500,
-                .scaleCalibration = -1903
+                .scaleCalibration = -1559.11,
+                .reactionTime = 150,
         };
     }
 
@@ -65,6 +66,7 @@ Settings::Settings() {
     this->purgeTargetTime = this->savedStorage.purgeTargetTime;
     this->grindTargetWeight = this->savedStorage.grindTargetWeight;
     this->scaleCalibration = this->savedStorage.scaleCalibration;
+    this->reactionTime = this->savedStorage.reactionTime;
 }
 
 void Settings::commitToEEPROM() {
@@ -73,7 +75,8 @@ void Settings::commitToEEPROM() {
         this->grindTargetTime != this->savedStorage.grindTargetTime ||
         this->purgeTargetTime != this->savedStorage.purgeTargetTime ||
         this->grindTargetWeight != this->savedStorage.grindTargetWeight ||
-        this->scaleCalibration != this->savedStorage.scaleCalibration
+        this->scaleCalibration != this->savedStorage.scaleCalibration ||
+        this->reactionTime != this->savedStorage.reactionTime
             ) {
         this->savedStorage = (SettingsStorageStruct){
                 .valid = true,
@@ -81,9 +84,18 @@ void Settings::commitToEEPROM() {
                 .purgeTargetTime = this->purgeTargetTime,
                 .grindTargetWeight = this->grindTargetWeight,
                 .productivity = this->productivity,
-                .scaleCalibration = this->scaleCalibration
+                .scaleCalibration = this->scaleCalibration,
+                .reactionTime = this->reactionTime,
         };
 
         settingsStorage.write(this->savedStorage);
     }
+}
+
+float Settings::getReactionTime() const {
+    return this->reactionTime;
+}
+
+void Settings::setReactionTime(unsigned short reactionTime) {
+    this->reactionTime = reactionTime;
 }

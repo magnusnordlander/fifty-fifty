@@ -5,8 +5,6 @@
 #include "GravimetricGrindViewController.h"
 #include <avr/dtostrf.h>
 
-#define REACTION_TIME_MICROS 200000
-
 GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
                                                                Settings *settings) : BaseGrindViewController(ssr) {
     this->scale = scale;
@@ -19,14 +17,14 @@ void GravimetricGrindViewController::tick(U8G2 display) {
         this->renderTaringView(display);
         display.sendBuffer();
 
-        scale->tare(10);
+        scale->tare();
         this->tared = true;
     } else {
         this->ssr->enable();
 
         this->redraw(display);
 
-        if (this->scale->getReactionCompensatedLatestValue(REACTION_TIME_MICROS)*1000 >= (float)(this->target_mg)) {
+        if (this->scale->getReactionCompensatedLatestValue(this->reaction_time)*1000 >= (float)(this->target_mg)) {
             this->navigationController->pop();
         }
     }
@@ -35,17 +33,17 @@ void GravimetricGrindViewController::tick(U8G2 display) {
 void GravimetricGrindViewController::viewWasPushed(NavigationController *controller) {
     BaseViewController::viewWasPushed(controller); // NOLINT(bugprone-parent-virtual-call)
 
-    this->scale->setRefreshing(true);
     this->startTime = millis();
     this->target_mg = this->settings->getGrindTargetWeight();
+    this->reaction_time = this->settings->getReactionTime();
 }
 
 void GravimetricGrindViewController::viewWillBePopped(NavigationController *controller) {
     BaseGrindViewController::viewWillBePopped(controller);
 
     this->target_mg = 0;
+    this->reaction_time = 0;
     this->tared = false;
-    this->scale->setRefreshing(false);
 }
 
 void GravimetricGrindViewController::render(U8G2 display) {

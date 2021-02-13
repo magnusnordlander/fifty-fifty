@@ -5,7 +5,7 @@
 #ifndef GRINDER_BASETIMESETTINGVIEWCONTROLLER_H
 #define GRINDER_BASETIMESETTINGVIEWCONTROLLER_H
 
-#include "BaseViewController.h"
+#include "ViewControllers/BaseViewController.h"
 #include "BaseSettingViewController.h"
 #include <Settings.h>
 #include <NavigationController.h>

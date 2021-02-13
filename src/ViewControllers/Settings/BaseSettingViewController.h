@@ -5,7 +5,7 @@
 #ifndef GRINDER_BASESETTINGVIEWCONTROLLER_H
 #define GRINDER_BASESETTINGVIEWCONTROLLER_H
 
-#include "BaseViewController.h"
+#include "ViewControllers/BaseViewController.h"
 #include <Settings.h>
 
 class BaseSettingViewController: public BaseViewController {

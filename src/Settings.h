@@ -14,6 +14,7 @@ typedef struct {
     unsigned short grindTargetWeight;
     unsigned short productivity;
     float scaleCalibration;
+    unsigned short reactionTime;
 } SettingsStorageStruct;
 
 class Settings {
@@ -35,6 +36,9 @@ public:
     float getScaleCalibration() const;
     void setScaleCalibration(float scaleCalibration);
 
+    float getReactionTime() const;
+    void setReactionTime(unsigned short reactionTime);
+
     void commitToEEPROM();
 private:
     unsigned short productivity; // milligrams per second
@@ -42,6 +46,7 @@ private:
     unsigned short grindTargetTime; // milliseconds
     unsigned short grindTargetWeight; // milligrams
     float scaleCalibration; // unitless
+    unsigned short reactionTime; // milliseconds
 
     SettingsStorageStruct savedStorage;
 };

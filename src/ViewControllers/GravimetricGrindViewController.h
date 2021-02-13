@@ -31,6 +31,7 @@ private:
     bool tared = false;
 
     unsigned long target_mg = 0;
+    unsigned short reaction_time = 0;
 };
 
 
