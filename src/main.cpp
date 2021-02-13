@@ -9,6 +9,7 @@
 #include "ViewControllers/Settings/PurgeTimeSettingViewController.h"
 #include "ViewControllers/Settings/GrindTimeSettingViewController.h"
 #include "ViewControllers/Settings/GrindTargetWeightSettingViewController.h"
+#include "ViewControllers/Settings/ReactionTimeSettingViewController.h"
 #include "ViewControllers/GravimetricGrindViewController.h"
 #include "ViewControllers/Settings/ProductivitySettingViewController.h"
 #include "ViewControllers/Settings/CalibrationViewController.h"
@@ -71,6 +72,7 @@ void setup(void) {
             new ViewControllerMenuItem("Purge time", new PurgeTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Grind time", new GrindTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Target weight", new GrindTargetWeightSettingViewController(settings)),
+            new ViewControllerMenuItem("Reaction time", new ReactionTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
             new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)

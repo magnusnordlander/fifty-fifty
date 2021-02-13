@@ -92,7 +92,7 @@ void Settings::commitToEEPROM() {
     }
 }
 
-float Settings::getReactionTime() const {
+unsigned short Settings::getReactionTime() const {
     return this->reactionTime;
 }
 

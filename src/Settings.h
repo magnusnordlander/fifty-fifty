@@ -36,7 +36,7 @@ public:
     float getScaleCalibration() const;
     void setScaleCalibration(float scaleCalibration);
 
-    float getReactionTime() const;
+    unsigned short getReactionTime() const;
     void setReactionTime(unsigned short reactionTime);
 
     void commitToEEPROM();
