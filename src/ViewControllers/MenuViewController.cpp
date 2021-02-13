@@ -74,14 +74,13 @@ void MenuViewController::handleRotation(int encoderDiff) {
     }
 }
 
-void MenuViewController::handleButtonState(bool state) {
-    if (state && this->navigationController) {
-        this->menuItems[this->currentSelection]->activate(this->navigationController);
-        delay(ENCODER_SW_DEAD_TIME);
-    }
-}
-
 void MenuViewController::viewWillBePopped(NavigationController *controller) {
     BaseViewController::viewWillBePopped(controller);
     this->currentSelection = 0;
+}
+
+void MenuViewController::handleButtonEvent(ButtonEvent event) {
+    if (event == BUTTON_LET_UP) {
+        this->menuItems[this->currentSelection]->activate(this->navigationController);
+    }
 }

@@ -43,18 +43,6 @@ void CalibrationViewController::viewWasPopped(NavigationController *controller) 
     this->scale->setAccurateMode(false);
 }
 
-void CalibrationViewController::handleButtonState(bool state) {
-    if (state) {
-        if (this->state == STATE_PRE_TARE) {
-            this->state = STATE_TARING;
-            this->scale->tareNoDelay();
-        } else if (this->state == STATE_TARED) {
-            this->state = STATE_MEASURING;
-            this->scale->clearAccuracyBuffer();
-        }
-    }
-}
-
 void CalibrationViewController::tick(U8G2 display) {
     BaseViewController::tick(display);
 
@@ -65,5 +53,17 @@ void CalibrationViewController::tick(U8G2 display) {
     if (this->state == STATE_MEASURING && this->scale->accuracyBufferFull()) {
         this->settings->setScaleCalibration(this->scale->measureCalibrationValue(100.));
         this->navigationController->pop();
+    }
+}
+
+void CalibrationViewController::handleButtonEvent(ButtonEvent event) {
+    if (event == BUTTON_LET_UP) {
+        if (this->state == STATE_PRE_TARE) {
+            this->state = STATE_TARING;
+            this->scale->tareNoDelay();
+        } else if (this->state == STATE_TARED) {
+            this->state = STATE_MEASURING;
+            this->scale->clearAccuracyBuffer();
+        }
     }
 }

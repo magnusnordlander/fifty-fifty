@@ -22,6 +22,7 @@
 #include "MenuItem/GrindByWeightMenuItem.h"
 #include "Settings.h"
 #include "ScaleWrapper.h"
+#include "ViewControllers/ButtonEvent.h"
 
 const int Encoder_SW_Pin = 4;
 const int Encoder_DT_Pin = 3; // Must be interrupt pin
@@ -38,6 +39,10 @@ long Encoder_Diff = 0;
 int Manual_Grind_State = HIGH;
 
 long Old_Encoder_Position  = 0;
+
+unsigned long Button_Press_Started_At = 0;
+
+ButtonEvent currentButtonEvent = BUTTON_INACTIVE;
 
 Encoder myEnc(Encoder_DT_Pin, Encoder_CLK_Pin);
 
@@ -93,6 +98,23 @@ void updateExternalState() {
     Encoder_SW_State = digitalRead(Encoder_SW_Pin);
     Manual_Grind_State = digitalRead(Manual_Grind_Pin);
 
+    if (Button_Press_Started_At == 0 && Encoder_SW_State == LOW) {
+        Button_Press_Started_At = micros();
+        currentButtonEvent = BUTTON_PRESS;
+    } else if (Button_Press_Started_At > 0 && Encoder_SW_State == LOW) {
+        currentButtonEvent = BUTTON_HOLD;
+    } else if (Button_Press_Started_At > 0 && Encoder_SW_State == HIGH) {
+        auto holdLength = micros() - Button_Press_Started_At;
+        if (holdLength > 200000) {
+            currentButtonEvent = BUTTON_PRESS_AND_HOLD_LET_UP;
+        } else {
+            currentButtonEvent = BUTTON_LET_UP;
+        }
+        Button_Press_Started_At = 0;
+    } else { // (Button_Press_Started_At == 0 && Encoder_SW_State == HIGH) {
+        currentButtonEvent = BUTTON_INACTIVE;
+    }
+
     scale->refresh();
 }
 
@@ -114,7 +136,7 @@ void loop(void) {
         nav->top()->handleRotation(Encoder_Diff);
     }
 
-    nav->top()->handleButtonState(Encoder_SW_State == LOW);
+    nav->top()->handleButtonEvent(currentButtonEvent);
 
     nav->top()->tick(u8g2);
 }

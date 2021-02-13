@@ -12,7 +12,7 @@ class BaseSettingViewController: public BaseViewController {
 public:
     void handleRotation(int encoderDiff) override;
 
-    void handleButtonState(bool state) override;
+    void handleButtonEvent(ButtonEvent event) override;
 
     explicit BaseSettingViewController(Settings *settings);
 

@@ -16,7 +16,7 @@ public:
     void render(U8G2 display) override;
 
     void handleRotation(int encoderDiff) override;
-    void handleButtonState(bool state) override;
+    void handleButtonEvent(ButtonEvent event) override;
 
     void viewWillBePopped(NavigationController *controller) override;
 

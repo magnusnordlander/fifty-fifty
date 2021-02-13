@@ -15,10 +15,14 @@ public:
 
     void render(U8G2 display) override;
 
-    void handleButtonState(bool state) override;
+    void handleButtonEvent(ButtonEvent event) override;
+
+    void tick(U8G2 display) override;
 
 protected:
     ScaleWrapper* scale;
+
+    boolean taring = false;
 };
 
 

@@ -15,8 +15,7 @@ void BaseViewController::handleRotation(int encoderDiff) {
 
 }
 
-void BaseViewController::handleButtonState(bool state) {
-
+void BaseViewController::handleButtonEvent(ButtonEvent event) {
 }
 
 void BaseViewController::viewWillBePushed(NavigationController *) {

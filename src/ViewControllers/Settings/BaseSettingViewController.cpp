@@ -21,13 +21,6 @@ void BaseSettingViewController::handleRotation(int encoderDiff) {
     }
 }
 
-void BaseSettingViewController::handleButtonState(bool state) {
-    if (state) {
-        this->navigationController->pop();
-        delay(ENCODER_SW_DEAD_TIME);
-    }
-}
-
 BaseSettingViewController::BaseSettingViewController(Settings *settings) : settings(settings) {
     this->target = 0;
 }
@@ -48,4 +41,10 @@ unsigned short BaseSettingViewController::getTargetFromSettings() {
 
 void BaseSettingViewController::stageTargetInSettings(unsigned short) {
 
+}
+
+void BaseSettingViewController::handleButtonEvent(ButtonEvent event) {
+    if (event == BUTTON_LET_UP) {
+        this->navigationController->pop();
+    }
 }

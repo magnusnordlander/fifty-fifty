@@ -19,7 +19,7 @@ public:
     explicit CalibrationViewController(Settings* settings, ScaleWrapper* scale);
     void render(U8G2 display) override;
 
-    void handleButtonState(bool state) override;
+    void handleButtonEvent(ButtonEvent event) override;
 
     void viewWillBePushed(NavigationController *controller) override;
 
