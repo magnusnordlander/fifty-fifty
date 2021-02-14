@@ -7,7 +7,7 @@ This project is in use and development.
 *There will be a Rev B PCB*. The Rev A PCB works, but unless you can print your own PCBs, you probably want to wait for the rev B.
 
 ### Upcoming Rev B changes
-* SMD components (except the Arduino, obviously)
+* Possibly SMD components (except the Arduino, obviously)
 * Populate the entire UEXT header, allowing for SPI displays
 * Load cell interface
 
