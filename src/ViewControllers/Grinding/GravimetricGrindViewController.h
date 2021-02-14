@@ -8,6 +8,7 @@
 #include "BaseGrindViewController.h"
 #include <Settings.h>
 #include <ScaleWrapper.h>
+#include <View/ProgressBarView.h>
 
 class GravimetricGrindViewController: public BaseGrindViewController {
 public:
@@ -22,13 +23,19 @@ public:
 
     void render(U8G2 display) override;
 
+    virtual ~GravimetricGrindViewController();
+
 private:
+    void renderGrindingView(U8G2 display);
     void renderTaringView(U8G2 display);
+
+    void startTare();
 
     Settings* settings;
     ScaleWrapper* scale;
+    ProgressBarView* progressBar;
 
-    bool tared = false;
+    bool taring = false;
 
     unsigned long target_mg = 0;
     unsigned short reaction_time = 0;

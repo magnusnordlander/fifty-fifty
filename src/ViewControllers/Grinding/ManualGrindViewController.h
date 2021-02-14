@@ -6,7 +6,7 @@
 #define GRINDER_MANUALGRINDVIEWCONTROLLER_H
 
 #include "BaseGrindViewController.h"
-#include "../SsrState.h"
+#include "SsrState.h"
 
 class ManualGrindViewController: public BaseGrindViewController {
 public:

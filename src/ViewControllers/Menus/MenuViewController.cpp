@@ -82,5 +82,7 @@ void MenuViewController::viewWillBePopped(NavigationController *controller) {
 void MenuViewController::handleButtonEvent(ButtonEvent event) {
     if (event == BUTTON_LET_UP) {
         this->menuItems[this->currentSelection]->activate(this->navigationController);
+    } else if (event == BUTTON_PRESS_AND_HOLD_LET_UP) {
+        this->menuItems[this->currentSelection]->activatePressAndHold(this->navigationController);
     }
 }

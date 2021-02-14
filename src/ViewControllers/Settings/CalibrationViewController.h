@@ -8,6 +8,7 @@
 #include <ViewControllers/BaseViewController.h>
 #include <Settings.h>
 #include <ScaleWrapper.h>
+#include <View/ProgressBarView.h>
 
 #define STATE_PRE_TARE 0
 #define STATE_TARING 1
@@ -27,9 +28,18 @@ public:
 
     void tick(U8G2 display) override;
 
+    virtual ~CalibrationViewController();
+
 protected:
+    void renderPreTareView(U8G2 display);
+    void renderTaringView(U8G2 display);
+    void renderTaredView(U8G2 display);
+    void renderMeasuringView(U8G2 display);
+
     Settings* settings;
     ScaleWrapper* scale;
+
+    ProgressBarView* progressBar;
 
     unsigned short state = STATE_PRE_TARE;
 };

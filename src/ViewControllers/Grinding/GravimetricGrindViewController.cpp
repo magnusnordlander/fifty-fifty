@@ -9,20 +9,18 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
                                                                Settings *settings) : BaseGrindViewController(ssr) {
     this->scale = scale;
     this->settings = settings;
+    this->progressBar = new ProgressBarView;
 }
 
 void GravimetricGrindViewController::tick(U8G2 display) {
-    if (!this->tared) {
-        display.clearBuffer();
-        this->renderTaringView(display);
-        display.sendBuffer();
+    this->redraw(display);
 
-        scale->tare();
-        this->tared = true;
-    } else {
+    if (this->taring && this->scale->getTareStatus()) {
+        this->taring = false;
+    }
+
+    if (!this->taring) {
         this->ssr->enable();
-
-        this->redraw(display);
 
         if (this->scale->getReactionCompensatedLatestValue(this->reaction_time)*1000 >= (float)(this->target_mg)) {
             this->navigationController->pop();
@@ -36,6 +34,7 @@ void GravimetricGrindViewController::viewWasPushed(NavigationController *control
     this->startTime = millis();
     this->target_mg = this->settings->getGrindTargetWeight();
     this->reaction_time = this->settings->getReactionTime();
+    this->startTare();
 }
 
 void GravimetricGrindViewController::viewWillBePopped(NavigationController *controller) {
@@ -43,10 +42,17 @@ void GravimetricGrindViewController::viewWillBePopped(NavigationController *cont
 
     this->target_mg = 0;
     this->reaction_time = 0;
-    this->tared = false;
 }
 
 void GravimetricGrindViewController::render(U8G2 display) {
+    if (this->taring) {
+        this->renderTaringView(display);
+    } else {
+        this->renderGrindingView(display);
+    }
+}
+
+void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
     display.setDrawColor(2);
@@ -73,4 +79,15 @@ void GravimetricGrindViewController::render(U8G2 display) {
 void GravimetricGrindViewController::renderTaringView(U8G2 display) {
     display.setFont(u8g2_font_helvB12_te);
     display.drawStr(32,36, "Taring...");
+
+    this->progressBar->drawRelative(display, 14, 54);
+}
+
+void GravimetricGrindViewController::startTare() {
+    this->taring = true;
+    this->scale->tareNoDelay();
+}
+
+GravimetricGrindViewController::~GravimetricGrindViewController() {
+    delete this->progressBar;
 }

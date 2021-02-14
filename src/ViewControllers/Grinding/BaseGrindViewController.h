@@ -5,7 +5,7 @@
 #ifndef GRINDER_BASEGRINDVIEWCONTROLLER_H
 #define GRINDER_BASEGRINDVIEWCONTROLLER_H
 
-#include "BaseViewController.h"
+#include "ViewControllers/BaseViewController.h"
 #include <SsrState.h>
 
 class BaseGrindViewController: public BaseViewController {

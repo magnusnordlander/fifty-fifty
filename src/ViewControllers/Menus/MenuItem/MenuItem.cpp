@@ -15,3 +15,7 @@ MenuItem::MenuItem() {
 void MenuItem::activate(NavigationController *) {
 
 }
+
+void MenuItem::activatePressAndHold(NavigationController *) {
+
+}

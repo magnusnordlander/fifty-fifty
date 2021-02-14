@@ -8,6 +8,7 @@
 
 #include "BaseViewController.h"
 #include <ScaleWrapper.h>
+#include <View/ProgressBarView.h>
 
 class ScaleViewController: public BaseViewController {
 public:
@@ -19,10 +20,14 @@ public:
 
     void tick(U8G2 display) override;
 
+    virtual ~ScaleViewController();
+
 protected:
     ScaleWrapper* scale;
 
     boolean taring = false;
+
+    ProgressBarView* progressBar;
 };
 
 

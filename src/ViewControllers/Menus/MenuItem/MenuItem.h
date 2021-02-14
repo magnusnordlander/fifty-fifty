@@ -13,6 +13,7 @@ public:
     MenuItem();
     virtual std::string getName();
     virtual void activate(NavigationController*);
+    virtual void activatePressAndHold(NavigationController *);
 protected:
     std::string name;
 };

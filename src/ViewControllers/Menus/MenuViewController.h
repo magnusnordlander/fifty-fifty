@@ -6,8 +6,8 @@
 #define GRINDER_MENUVIEWCONTROLLER_H
 
 #include <vector>
-#include "BaseViewController.h"
-#include "../MenuItem/MenuItem.h"
+#include "ViewControllers/BaseViewController.h"
+#include "MenuItem/MenuItem.h"
 
 class MenuViewController: public BaseViewController {
 public:
