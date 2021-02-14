@@ -13,11 +13,14 @@ public:
     std::string getName() override;
 
     ViewControllerMenuItem(std::string name, BaseViewController *viewController);
+    ViewControllerMenuItem(std::string name, BaseViewController *viewController, BaseViewController *secondaryViewController);
 
     void activate(NavigationController *controller) override;
 
-private:
+    void activatePressAndHold(NavigationController *controller) override;
+protected:
     BaseViewController* viewController;
+    BaseViewController* secondaryViewController = nullptr;
 };
 
 

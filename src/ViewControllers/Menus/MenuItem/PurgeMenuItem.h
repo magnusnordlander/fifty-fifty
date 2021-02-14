@@ -7,12 +7,15 @@
 
 #include "ViewControllerMenuItem.h"
 #include <Settings.h>
+#include <ViewControllers/Grinding/PurgeViewController.h>
 
 class PurgeMenuItem: public ViewControllerMenuItem {
 public:
-    explicit PurgeMenuItem(BaseViewController *viewController, Settings* settings);
+    explicit PurgeMenuItem(PurgeViewController *viewController, Settings* settings);
 
     std::string getName() override;
+
+    virtual ~PurgeMenuItem();
 
 private:
     Settings* settings;

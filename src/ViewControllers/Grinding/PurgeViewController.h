@@ -14,8 +14,9 @@ public:
 
     void tick(U8G2 display) override;
 
-    void viewWasPushed(NavigationController *controller) override;
+    void setTemporaryTarget(unsigned long targetTime);
 
+    void viewWasPushed(NavigationController *controller) override;
     void viewWillBePopped(NavigationController *controller) override;
 
     void render(U8G2 display) override;
@@ -24,6 +25,7 @@ protected:
     Settings* settings;
 
     unsigned long target_ms = 0;
+    unsigned long temporary_target = 0;
 };
 
 

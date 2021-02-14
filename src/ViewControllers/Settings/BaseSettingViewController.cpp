@@ -4,8 +4,6 @@
 
 #include "BaseSettingViewController.h"
 
-#define ENCODER_SW_DEAD_TIME 200
-
 void BaseSettingViewController::handleRotation(int encoderDiff) {
     int amplified_encoder_diff = encoderDiff * this->settingSensitivity;
 

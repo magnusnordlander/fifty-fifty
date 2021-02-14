@@ -2,10 +2,12 @@
 // Created by Magnus Nordlander on 2021-02-07.
 //
 
+#include <ViewControllers/Grinding/TemporaryTargets/TemporaryPurgeTargetViewController.h>
 #include "PurgeMenuItem.h"
 
-PurgeMenuItem::PurgeMenuItem(BaseViewController *viewController, Settings* settings) : ViewControllerMenuItem("Purge?", viewController) {
+PurgeMenuItem::PurgeMenuItem(PurgeViewController *viewController, Settings* settings) : ViewControllerMenuItem("Purge?", viewController) {
     this->settings = settings;
+    this->secondaryViewController = new TemporaryPurgeTargetViewController(settings, viewController);
 }
 
 std::string PurgeMenuItem::getName() {
@@ -16,4 +18,8 @@ std::string PurgeMenuItem::getName() {
     std::string buffAsStdStr = purge_string;
 
     return buffAsStdStr;
+}
+
+PurgeMenuItem::~PurgeMenuItem() {
+    delete this->secondaryViewController;
 }

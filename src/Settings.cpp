@@ -57,7 +57,7 @@ Settings::Settings() {
                 .grindTargetWeight = 16000,
                 .productivity = 2500,
                 .scaleCalibration = -1559.11,
-                .reactionTime = 150,
+                .reactionTime = 450,
         };
     }
 

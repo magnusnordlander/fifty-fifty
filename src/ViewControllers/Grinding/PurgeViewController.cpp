@@ -15,12 +15,17 @@ void PurgeViewController::tick(U8G2 display) {
 void PurgeViewController::viewWasPushed(NavigationController *controller) {
     BaseGrindViewController::viewWasPushed(controller);
 
-    this->target_ms = this->settings->getPurgeTargetTime();
+    if (this->temporary_target > 0) {
+        this->target_ms = this->temporary_target;
+    } else {
+        this->target_ms = this->settings->getPurgeTargetTime();
+    }
 }
 
 void PurgeViewController::viewWillBePopped(NavigationController *controller) {
     BaseGrindViewController::viewWillBePopped(controller);
 
+    this->temporary_target = 0;
     this->target_ms = 0;
 }
 
@@ -51,4 +56,8 @@ void PurgeViewController::render(U8G2 display) {
     }
 
 
+}
+
+void PurgeViewController::setTemporaryTarget(unsigned long targetTime) {
+    this->temporary_target = targetTime;
 }
