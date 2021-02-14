@@ -17,12 +17,18 @@ void BaseGrindViewController::viewWasPushed(NavigationController *controller) {
 void BaseGrindViewController::viewWillBePopped(NavigationController *controller) {
     BaseViewController::viewWillBePopped(controller);
     this->startTime = 0;
+    this->temporary_target = 0;
     this->ssr->disable();
 }
 
 BaseGrindViewController::BaseGrindViewController(SsrState *ssr) : ssr(ssr) {
     this->startTime = 0;
 }
+
+void BaseGrindViewController::setTemporaryTarget(unsigned long target) {
+    this->temporary_target = target;
+}
+
 
 unsigned long BaseGrindViewController::elapsedMillis() const {
     return millis() - this->startTime;

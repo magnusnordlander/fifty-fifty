@@ -3,6 +3,7 @@
 //
 
 #include "PurgeViewController.h"
+#include <Utils/TextUtils.h>
 
 void PurgeViewController::tick(U8G2 display) {
     BaseViewController::tick(display);
@@ -25,7 +26,6 @@ void PurgeViewController::viewWasPushed(NavigationController *controller) {
 void PurgeViewController::viewWillBePopped(NavigationController *controller) {
     BaseGrindViewController::viewWillBePopped(controller);
 
-    this->temporary_target = 0;
     this->target_ms = 0;
 }
 
@@ -43,21 +43,5 @@ void PurgeViewController::render(U8G2 display) {
     unsigned short elapsed_ms = this->elapsedMillis();
     unsigned short remaining_ms = this->target_ms - elapsed_ms;
 
-    char time_string[25];
-    snprintf(time_string, sizeof(time_string), "%d.%02d", (int)remaining_ms/1000, (int)(remaining_ms/10)%100);
-
-    display.setFont(u8g2_font_logisoso24_tr); // choose a suitable font
-    if (remaining_ms < 10000) {
-        display.drawStr(24,32,time_string);
-        display.drawStr(96, 32, "s");
-    } else {
-        display.drawStr(8,32,time_string);
-        display.drawStr(100, 32, "s");
-    }
-
-
-}
-
-void PurgeViewController::setTemporaryTarget(unsigned long targetTime) {
-    this->temporary_target = targetTime;
+    drawLargeFloatWithUnits(display, (float)(remaining_ms)/1000, "s", 32, 3, 2);
 }

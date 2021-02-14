@@ -4,6 +4,7 @@
 
 #include "GravimetricGrindViewController.h"
 #include <avr/dtostrf.h>
+#include <Utils/TextUtils.h>
 
 GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
                                                                Settings *settings) : BaseGrindViewController(ssr) {
@@ -32,7 +33,13 @@ void GravimetricGrindViewController::viewWasPushed(NavigationController *control
     BaseViewController::viewWasPushed(controller); // NOLINT(bugprone-parent-virtual-call)
 
     this->startTime = millis();
-    this->target_mg = this->settings->getGrindTargetWeight();
+
+    if (this->temporary_target > 0) {
+        this->target_mg = this->temporary_target;
+    } else {
+        this->target_mg = this->settings->getGrindTargetWeight();
+    }
+
     this->reaction_time = this->settings->getReactionTime();
     this->startTare();
 }
@@ -63,17 +70,7 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
     unsigned short ground_mg = (int)(this->scale->getLatestValue()*1000);
     unsigned short remaining_mg = this->target_mg - ground_mg;
 
-    char time_string[25];
-    dtostrf((float)(remaining_mg)/1000., 3, 1, time_string);
-
-    display.setFont(u8g2_font_logisoso24_tr); // choose a suitable font
-    if (remaining_mg < 10000) {
-        display.drawStr(40,32,time_string);
-        display.drawStr(96, 32, "g");
-    } else {
-        display.drawStr(24,32,time_string);
-        display.drawStr(100, 32, "g");
-    }
+    drawLargeFloatWithUnits(display, (float)(remaining_mg)/1000., "g", 32, 3, 2);
 }
 
 void GravimetricGrindViewController::renderTaringView(U8G2 display) {

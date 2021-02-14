@@ -2,10 +2,12 @@
 // Created by Magnus Nordlander on 2021-02-07.
 //
 
+#include <ViewControllers/Grinding/TemporaryTargets/TemporaryTimedGrindTargetViewController.h>
 #include "GrindMenuItem.h"
 
-GrindMenuItem::GrindMenuItem(BaseViewController *viewController, Settings* settings) : ViewControllerMenuItem("Grind?", viewController) {
+GrindMenuItem::GrindMenuItem(TimedGrindViewController *viewController, Settings* settings) : ViewControllerMenuItem("Grind?", viewController) {
     this->settings = settings;
+    this->secondaryViewController = new TemporaryTimedGrindTargetViewController(settings, viewController);
 }
 
 std::string GrindMenuItem::getName() {
@@ -16,4 +18,8 @@ std::string GrindMenuItem::getName() {
     std::string buffAsStdStr = purge_string;
 
     return buffAsStdStr;
+}
+
+GrindMenuItem::~GrindMenuItem() {
+    delete this->secondaryViewController;
 }

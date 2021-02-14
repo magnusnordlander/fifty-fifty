@@ -8,14 +8,13 @@
 #include <ViewControllers/BaseViewController.h>
 #include <Settings.h>
 #include <ViewControllers/Grinding/PurgeViewController.h>
+#include "BaseTemporaryGrindTargetViewController.h"
 
-class TemporaryPurgeTargetViewController: public BaseViewController {
+class TemporaryPurgeTargetViewController: public BaseTemporaryGrindTargetViewController {
 public:
     explicit TemporaryPurgeTargetViewController(Settings *settings, PurgeViewController* purgeViewController);
 
     void render(U8G2 display) override;
-
-    void handleRotation(int encoderDiff) override;
 
     void handleButtonEvent(ButtonEvent event) override;
 
@@ -24,9 +23,6 @@ public:
     void subviewWasPopped(NavigationController *controller, BaseViewController *viewController) override;
 
 protected:
-    unsigned short target = 0;
-    unsigned short settingSensitivity = 4;
-    Settings* settings;
     PurgeViewController* purgeViewController;
 };
 

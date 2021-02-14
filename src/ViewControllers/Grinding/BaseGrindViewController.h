@@ -20,10 +20,13 @@ public:
 
     void subviewWillBePushed(NavigationController *controller, BaseViewController *) override;
 
+    void setTemporaryTarget(unsigned long target);
+
 protected:
     SsrState* ssr;
     unsigned long startTime;
     unsigned long elapsedMillis() const;
+    unsigned long temporary_target = 0;
 };
 
 

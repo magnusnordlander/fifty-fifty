@@ -3,6 +3,7 @@
 //
 
 #include "ManualGrindViewController.h"
+#include <Utils/TextUtils.h>
 
 void ManualGrindViewController::render(U8G2 display) {
 
@@ -14,17 +15,5 @@ void ManualGrindViewController::render(U8G2 display) {
 
     unsigned long elapsed_ms = this->elapsedMillis();
 
-    char time_string[25];
-    snprintf(time_string, sizeof(time_string), "%d.%02d", (int)elapsed_ms/1000, (int)(elapsed_ms/10)%100);
-
-    display.setFont(u8g2_font_logisoso24_tr); // choose a suitable font
-    if (elapsed_ms < 10000) {
-        display.drawStr(24,32,time_string);
-        display.drawStr(96, 32, "s");
-    } else {
-        display.drawStr(8,32,time_string);
-        display.drawStr(100, 32, "s");
-    }
-
-
+    drawLargeFloatWithUnits(display, (float)elapsed_ms/1000., "s", 32, 3, 2);
 }

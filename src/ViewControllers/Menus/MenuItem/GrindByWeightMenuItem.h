@@ -7,12 +7,15 @@
 
 #include "ViewControllerMenuItem.h"
 #include <Settings.h>
+#include <ViewControllers/Grinding/GravimetricGrindViewController.h>
 
 class GrindByWeightMenuItem: public ViewControllerMenuItem {
 public:
-    explicit GrindByWeightMenuItem(BaseViewController *viewController, Settings* settings);
+    explicit GrindByWeightMenuItem(GravimetricGrindViewController *viewController, Settings* settings);
 
     std::string getName() override;
+
+    virtual ~GrindByWeightMenuItem();
 
 private:
     Settings* settings;

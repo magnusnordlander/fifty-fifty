@@ -4,9 +4,11 @@
 
 #include "GrindByWeightMenuItem.h"
 #include <avr/dtostrf.h>
+#include <ViewControllers/Grinding/TemporaryTargets/TemporaryGravimetricGrindTargetViewController.h>
 
-GrindByWeightMenuItem::GrindByWeightMenuItem(BaseViewController *viewController, Settings* settings) : ViewControllerMenuItem("Grind?", viewController) {
+GrindByWeightMenuItem::GrindByWeightMenuItem(GravimetricGrindViewController *viewController, Settings* settings) : ViewControllerMenuItem("Grind?", viewController) {
     this->settings = settings;
+    this->secondaryViewController = new TemporaryGravimetricGrindTargetViewController(settings, viewController);
 }
 
 std::string GrindByWeightMenuItem::getName() {
@@ -19,4 +21,8 @@ std::string GrindByWeightMenuItem::getName() {
     std::string buffAsStdStr = purge_string;
 
     return buffAsStdStr;
+}
+
+GrindByWeightMenuItem::~GrindByWeightMenuItem() {
+    delete this->secondaryViewController;
 }

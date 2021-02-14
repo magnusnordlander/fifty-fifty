@@ -107,7 +107,7 @@ void updateExternalState() {
         currentButtonEvent = BUTTON_HOLD;
     } else if (Button_Press_Started_At > 0 && Encoder_SW_State == HIGH) {
         auto holdLength = micros() - Button_Press_Started_At;
-        if (holdLength > 200000) {
+        if (holdLength > 300000) {
             currentButtonEvent = BUTTON_PRESS_AND_HOLD_LET_UP;
         } else {
             currentButtonEvent = BUTTON_LET_UP;

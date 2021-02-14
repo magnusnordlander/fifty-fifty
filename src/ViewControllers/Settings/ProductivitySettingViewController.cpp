@@ -3,18 +3,10 @@
 //
 
 #include "ProductivitySettingViewController.h"
+#include <Utils/TextUtils.h>
 
 void ProductivitySettingViewController::render(U8G2 display) {
-
-
-    char productivity_string[25];
-    float Productivity_S = (float)this->target/1000;
-    snprintf(productivity_string, sizeof(productivity_string), "%d.%02d g/s", (int)Productivity_S, (int)(Productivity_S*100)%100);
-
-    display.setFont(u8g2_font_logisoso24_tr); // choose a suitable font
-    display.drawStr(8,42,productivity_string);
-
-
+    drawLargeFloatWithUnits(display, (float)this->target/1000, "g/s", 42, 3, 2);
 }
 
 unsigned short ProductivitySettingViewController::getTargetFromSettings() {

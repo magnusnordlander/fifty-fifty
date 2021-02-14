@@ -7,12 +7,15 @@
 
 #include "ViewControllerMenuItem.h"
 #include <Settings.h>
+#include <ViewControllers/Grinding/TimedGrindViewController.h>
 
 class GrindMenuItem: public ViewControllerMenuItem {
 public:
-    explicit GrindMenuItem(BaseViewController *viewController, Settings* settings);
+    explicit GrindMenuItem(TimedGrindViewController *viewController, Settings* settings);
 
     std::string getName() override;
+
+    virtual ~GrindMenuItem();
 
 private:
     Settings* settings;
