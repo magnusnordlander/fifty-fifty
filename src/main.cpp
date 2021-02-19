@@ -33,7 +33,12 @@ const int Ssr_Pin = 15;
 const int Scale_DOUT_Pin = 9;
 const int Scale_CLK_Pin = 10;
 
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+const int Display_SPI_DC = 19;
+const int Display_SPI_RES = 18;
+const int UEXT_SPI_CS = 16;
+
+//U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS, Display_SPI_DC, Display_SPI_RES);
 
 int Encoder_SW_State = 0;
 long Encoder_Diff = 0;
