@@ -6,8 +6,6 @@
 
 #include <utility>
 #define MENU_ROW_HEIGHT 14
-#define MENU_SENSITIVITY 3
-#define ENCODER_SW_DEAD_TIME 200
 
 void MenuViewController::render(U8G2 display) {
 
@@ -57,20 +55,32 @@ MenuViewController::MenuViewController(std::vector<MenuItem*> items) {
 void MenuViewController::handleRotation(int encoderDiff) {
     unsigned int numMenuItems = this->menuItems.size();
 
-    overflow += encoderDiff;
-
-    if (overflow > MENU_SENSITIVITY) {
-        overflow = 0;
-        currentSelection = (currentSelection + 1) % numMenuItems;
+    bool direction = encoderDiff > 0;
+    if (direction != lastDirection && lastScrollEvent + MENU_SCROLL_DEAD_TIME_DIRECTION_SWITCH > micros()) {
+        return;
     }
 
-    if (overflow < -MENU_SENSITIVITY) {
-        overflow = 0;
-        if (currentSelection == 0) {
-            currentSelection = numMenuItems-1;
+    unsigned int deadTime = MENU_SCROLL_DEAD_TIME_MICROS;
+
+    if (abs(encoderDiff) >= MENU_DOUBLE_SCROLL_THRESHOLD) {
+        deadTime = MENU_SCROLL_DOUBLE_SCROLL_DEAD_TIME_MICROS;
+    }
+
+    if (lastScrollEvent + deadTime < micros()) {
+        unsigned short steps = 1;
+
+        if (direction) {
+            currentSelection = (currentSelection + steps) % numMenuItems;
         } else {
-            currentSelection = (currentSelection - 1) % numMenuItems;
+            if (currentSelection == 0) {
+                currentSelection = numMenuItems - steps;
+            } else {
+                currentSelection = (currentSelection - steps) % numMenuItems;
+            }
         }
+
+        lastScrollEvent = micros();
+        lastDirection = direction;
     }
 }
 

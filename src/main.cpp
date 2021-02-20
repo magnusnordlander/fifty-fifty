@@ -45,10 +45,15 @@
 #define UEXT_I2C_SCL_PIN 19
 #define UEXT_I2C_SDA_PIN 18
 
-#define SCROLL_DIRECTION -1
 
+#ifdef DEBUG_RIG
+#define SCROLL_DIRECTION 1
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+#else
+#define SCROLL_DIRECTION -1
 // Use I2C SCL as SSD1309 DC and I2C SDA as SSD1309 RES
 U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS_PIN, UEXT_I2C_SCL_PIN, UEXT_I2C_SDA_PIN);
+#endif
 
 int Encoder_SW_State = 0;
 long Encoder_Diff = 0;
@@ -68,13 +73,14 @@ ManualGrindViewController* manualGrindView = nullptr;
 NavigationController* nav = nullptr;
 
 void setup(void) {
-//    delay(1000);
-
     pinMode(MANUAL_GRIND_PIN, INPUT_PULLUP);
     pinMode(ENCODER_SW_PIN, INPUT_PULLUP);
 
     u8g2.begin();
+
+    #ifdef DEBUG_RIG
     Serial.begin(9600);
+    #endif
 
     ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
@@ -109,6 +115,9 @@ void updateExternalState() {
     long new_encoder_position = myEnc.read();
     if (new_encoder_position != Old_Encoder_Position) {
         Encoder_Diff = (new_encoder_position - Old_Encoder_Position);
+        #ifdef DEBUG_RIG
+        Serial.println(Encoder_Diff);
+        #endif
         Old_Encoder_Position = new_encoder_position;
     }
 

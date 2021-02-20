@@ -53,7 +53,7 @@ Settings::Settings() {
         this->savedStorage = (SettingsStorageStruct){
                 .valid =  false,
                 .grindTargetTime = 6400,
-                .purgeTargetTime = 1000,
+                .purgeTargetTime = 500,
                 .grindTargetWeight = 16000,
                 .productivity = 2500,
                 .scaleCalibration = -1559.11,

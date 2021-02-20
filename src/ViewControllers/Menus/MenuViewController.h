@@ -9,6 +9,11 @@
 #include "ViewControllers/BaseViewController.h"
 #include "MenuItem/MenuItem.h"
 
+#define MENU_SCROLL_DEAD_TIME_MICROS 120000
+#define MENU_SCROLL_DOUBLE_SCROLL_DEAD_TIME_MICROS 30000
+#define MENU_SCROLL_DEAD_TIME_DIRECTION_SWITCH 500000
+#define MENU_DOUBLE_SCROLL_THRESHOLD 5
+
 class MenuViewController: public BaseViewController {
 public:
     explicit MenuViewController(std::vector<MenuItem*> menuItems);
@@ -27,6 +32,9 @@ private:
 
     unsigned short currentSelection = 0;
     short overflow = 0;
+
+    unsigned long lastScrollEvent = 0;
+    bool lastDirection = true;
 };
 
 

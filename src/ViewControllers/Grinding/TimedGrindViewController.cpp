@@ -6,9 +6,10 @@
 #include <Utils/TextUtils.h>
 
 void TimedGrindViewController::tick(U8G2 display) {
-    BaseViewController::tick(display);
+    BaseGrindViewController::tick(display);
 
     if (this->elapsedMillis() >= this->target_ms) {
+        this->grinding = false;
         this->navigationController->pop();
     }
 }

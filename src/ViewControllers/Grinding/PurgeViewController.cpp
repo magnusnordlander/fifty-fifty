@@ -6,7 +6,7 @@
 #include <Utils/TextUtils.h>
 
 void PurgeViewController::tick(U8G2 display) {
-    BaseViewController::tick(display);
+    BaseGrindViewController::tick(display);
 
     if (this->elapsedMillis() >= this->target_ms) {
         this->navigationController->pop();

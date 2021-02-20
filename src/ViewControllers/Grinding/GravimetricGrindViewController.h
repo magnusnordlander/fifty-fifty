@@ -23,6 +23,8 @@ public:
 
     void render(U8G2 display) override;
 
+    void handleButtonEvent(ButtonEvent event) override;
+
     virtual ~GravimetricGrindViewController();
 
 private:
@@ -36,6 +38,7 @@ private:
     ProgressBarView* progressBar;
 
     bool taring = false;
+    bool done = false;
 
     unsigned long target_mg = 0;
     unsigned short reaction_time = 0;

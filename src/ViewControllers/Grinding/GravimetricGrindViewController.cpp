@@ -14,17 +14,17 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 }
 
 void GravimetricGrindViewController::tick(U8G2 display) {
-    this->redraw(display);
+    BaseGrindViewController::tick(display);
 
     if (this->taring && this->scale->getTareStatus()) {
         this->taring = false;
+        this->grinding = true;
     }
 
-    if (!this->taring) {
-        this->ssr->enable();
-
+    if (!this->taring && !this->done) {
         if (this->scale->getReactionCompensatedLatestValue(this->reaction_time)*1000 >= (float)(this->target_mg)) {
-            this->navigationController->pop();
+            this->grinding = false;
+            this->done = true;
         }
     }
 }
@@ -33,6 +33,7 @@ void GravimetricGrindViewController::viewWasPushed(NavigationController *control
     BaseViewController::viewWasPushed(controller); // NOLINT(bugprone-parent-virtual-call)
 
     this->startTime = millis();
+    this->done = false;
 
     if (this->temporary_target > 0) {
         this->target_mg = this->temporary_target;
@@ -49,6 +50,7 @@ void GravimetricGrindViewController::viewWillBePopped(NavigationController *cont
 
     this->target_mg = 0;
     this->reaction_time = 0;
+    this->done = false;
 }
 
 void GravimetricGrindViewController::render(U8G2 display) {
@@ -60,17 +62,21 @@ void GravimetricGrindViewController::render(U8G2 display) {
 }
 
 void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
-    display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
     display.setDrawColor(2);
 
     display.setFont(u8g2_font_helvB12_te);
-    display.drawStr(32,56, "Grinding");
 
-    unsigned short ground_mg = (int)(this->scale->getLatestValue()*1000);
-    unsigned short remaining_mg = this->target_mg - ground_mg;
+    unsigned int ground_mg = (int)(this->scale->getLatestValue()*1000);
+    signed int remaining_mg = this->target_mg - ground_mg;
 
-    drawLargeFloatWithUnits(display, (float)(remaining_mg)/1000., "g", 32, 3, 2);
+    if (this->done) {
+        display.drawStr(40,56, "Done");
+        drawLargeFloatWithUnits(display, (float)(ground_mg)/1000., "g", 32, 5, 1);
+    } else {
+        display.drawStr(32,56, "Grinding");
+        drawLargeFloatWithUnits(display, (float)(remaining_mg)/1000., "g", 32, 5, 1);
+    }
 }
 
 void GravimetricGrindViewController::renderTaringView(U8G2 display) {
@@ -87,4 +93,10 @@ void GravimetricGrindViewController::startTare() {
 
 GravimetricGrindViewController::~GravimetricGrindViewController() {
     delete this->progressBar;
+}
+
+void GravimetricGrindViewController::handleButtonEvent(ButtonEvent event) {
+    if (event == BUTTON_LET_UP) {
+        this->navigationController->pop();
+    }
 }

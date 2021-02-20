@@ -14,6 +14,8 @@ public:
 
     void render(U8G2 display) override;
 
+    void tick(U8G2 display) override;
+
     void viewWasPushed(NavigationController *controller) override;
 
     void viewWillBePopped(NavigationController *controller) override;
@@ -27,6 +29,7 @@ protected:
     unsigned long startTime;
     unsigned long elapsedMillis() const;
     unsigned long temporary_target = 0;
+    bool grinding = false;
 };
 
 

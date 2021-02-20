@@ -11,13 +11,14 @@ void BaseGrindViewController::render(U8G2 display) {
 void BaseGrindViewController::viewWasPushed(NavigationController *controller) {
     BaseViewController::viewWasPushed(controller);
     this->startTime = millis();
-    this->ssr->enable();
+    this->grinding = true;
 }
 
 void BaseGrindViewController::viewWillBePopped(NavigationController *controller) {
     BaseViewController::viewWillBePopped(controller);
     this->startTime = 0;
     this->temporary_target = 0;
+    this->grinding = false;
     this->ssr->disable();
 }
 
@@ -37,4 +38,14 @@ unsigned long BaseGrindViewController::elapsedMillis() const {
 void BaseGrindViewController::subviewWillBePushed(NavigationController *controller, BaseViewController *) {
     // Remove ourselves first
     controller->pop();
+}
+
+void BaseGrindViewController::tick(U8G2 display) {
+    if (this->grinding) {
+        this->ssr->enable();
+    } else {
+        this->ssr->disable();
+    }
+
+    BaseViewController::tick(display);
 }
