@@ -2,7 +2,6 @@
 #include <U8g2lib.h>
 #include <Wire.h>
 #include <Encoder.h>
-#include <avr/dtostrf.h>
 #include "NavigationController.h"
 #include "ViewControllers/Menus/MenuViewController.h"
 #include "ViewControllers/Grinding/ManualGrindViewController.h"
@@ -25,20 +24,31 @@
 #include "ScaleWrapper.h"
 #include "ViewControllers/ButtonEvent.h"
 
-const int Encoder_SW_Pin = 4;
-const int Encoder_DT_Pin = 3; // Must be interrupt pin
-const int Encoder_CLK_Pin = 2; // Must be interrupt pin
-const int Manual_Grind_Pin = 14;
-const int Ssr_Pin = 15;
-const int Scale_DOUT_Pin = 9;
-const int Scale_CLK_Pin = 10;
+// DT and CLK must be interrupt pins
+#define ENCODER_SW_PIN 4
+#define ENCODER_DT_PIN 3
+#define ENCODER_CLK_PIN 2
 
-const int Display_SPI_DC = 19;
-const int Display_SPI_RES = 18;
-const int UEXT_SPI_CS = 16;
+#define MANUAL_GRIND_PIN 14
 
-//U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
-U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS, Display_SPI_DC, Display_SPI_RES);
+#define SSR_PIN 15
+
+// DOUT and CLK must be interrupt pins
+#define HX711_DOUT_PIN 9
+#define HX711_CLK_PIN 10
+
+// With the exception of CS, these pins are hardware supported
+#define UEXT_SPI_CS_PIN 16
+#define UEXT_SPI_SCK_PIN 13
+#define UEXT_SPI_MISO_PIN 12
+#define UEXT_SPI_MOSI_PIN 11
+#define UEXT_I2C_SCL_PIN 19
+#define UEXT_I2C_SDA_PIN 18
+
+#define SCROLL_DIRECTION -1
+
+// Use I2C SCL as SSD1309 DC and I2C SDA as SSD1309 RES
+U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS_PIN, UEXT_I2C_SCL_PIN, UEXT_I2C_SDA_PIN);
 
 int Encoder_SW_State = 0;
 long Encoder_Diff = 0;
@@ -50,7 +60,7 @@ unsigned long Button_Press_Started_At = 0;
 
 ButtonEvent currentButtonEvent = BUTTON_INACTIVE;
 
-Encoder myEnc(Encoder_DT_Pin, Encoder_CLK_Pin);
+Encoder myEnc(ENCODER_DT_PIN, ENCODER_CLK_PIN);
 
 ScaleWrapper* scale;
 SsrState* ssr = nullptr;
@@ -60,16 +70,16 @@ NavigationController* nav = nullptr;
 void setup(void) {
 //    delay(1000);
 
-    pinMode(Manual_Grind_Pin, INPUT_PULLUP);
-    pinMode(Encoder_SW_Pin, INPUT_PULLUP);
+    pinMode(MANUAL_GRIND_PIN, INPUT_PULLUP);
+    pinMode(ENCODER_SW_PIN, INPUT_PULLUP);
 
     u8g2.begin();
     Serial.begin(9600);
 
-    ssr = new SsrState(Ssr_Pin);
+    ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
 
-    scale = ScaleWrapper::GetInstance(Scale_DOUT_Pin, Scale_CLK_Pin, settings);
+    scale = ScaleWrapper::GetInstance(HX711_DOUT_PIN, HX711_CLK_PIN, settings);
 
     manualGrindView = new ManualGrindViewController(ssr);
 
@@ -102,8 +112,8 @@ void updateExternalState() {
         Old_Encoder_Position = new_encoder_position;
     }
 
-    Encoder_SW_State = digitalRead(Encoder_SW_Pin);
-    Manual_Grind_State = digitalRead(Manual_Grind_Pin);
+    Encoder_SW_State = digitalRead(ENCODER_SW_PIN);
+    Manual_Grind_State = digitalRead(MANUAL_GRIND_PIN);
 
     if (Button_Press_Started_At == 0 && Encoder_SW_State == LOW) {
         Button_Press_Started_At = micros();
@@ -140,7 +150,7 @@ void loop(void) {
     }
 
     if (Encoder_Diff != 0) {
-        nav->top()->handleRotation(Encoder_Diff);
+        nav->top()->handleRotation(Encoder_Diff * SCROLL_DIRECTION);
     }
 
     nav->top()->handleButtonEvent(currentButtonEvent);
