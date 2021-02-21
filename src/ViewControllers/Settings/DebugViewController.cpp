@@ -8,7 +8,8 @@ void DebugViewController::render(U8G2 display) {
     display.setFont(u8g2_font_ncenB08_tr);
 
     char full[32];
-    display.drawStr(0,8, "Version: ");
+    snprintf(full, sizeof(full), "Scale SD: %f", this->scale->scaleStandardDeviation(2000000, 15));
+    display.drawStr(0,8, full);
 
     snprintf(full, sizeof(full), "Scale raw: %ld", this->scale->latestValues->front().measuringPoint);
     display.drawStr(0, 17, full);

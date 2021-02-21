@@ -35,7 +35,7 @@ void ScaleViewController::handleButtonEvent(ButtonEvent event) {
 }
 
 void ScaleViewController::tick(U8G2 display) {
-    if (this->taring && this->scale->isValueStable(2000000, 15, 50)) {
+    if (this->taring && this->scale->isValueStable(2000000, 15, 75)) {
         this->scale->tare(2000000);
         this->taring = false;
     }

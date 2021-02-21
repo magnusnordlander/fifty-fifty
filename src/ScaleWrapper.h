@@ -50,6 +50,8 @@ private:
     int32_t averageLast(microtime_t relMicros);
     MeasuringPoint firstValueSince(microtime_t relMicros);
 
+    float scaleStandardDeviation(microtime_t relMicros, unsigned short minValues);
+
     int32_t tareValue = 0;
     float calibrationValue = 0;
 

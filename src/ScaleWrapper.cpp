@@ -177,6 +177,12 @@ int32_t ScaleWrapper::averageLast(microtime_t relMicros) {
 }
 
 bool ScaleWrapper::isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma) {
+    float val = this->scaleStandardDeviation(relMicros, minValues);
+
+    return val < sigma;
+}
+
+float ScaleWrapper::scaleStandardDeviation(microtime_t relMicros, unsigned short minValues) {
     long s = latestValues->size();
     long sum = 0;
     uint8_t valuesUsed = 0;
@@ -191,7 +197,7 @@ bool ScaleWrapper::isValueStable(microtime_t relMicros, unsigned short minValues
     }
 
     if (valuesUsed < minValues || valuesUsed == 0) {
-        return false;
+        return NAN;
     }
 
     int32_t mean = sum / valuesUsed;
@@ -205,8 +211,6 @@ bool ScaleWrapper::isValueStable(microtime_t relMicros, unsigned short minValues
     }
 
     float val = sqrt(sd/(float)valuesUsed);
-
-    return val < sigma;
 }
 
 MeasuringPoint ScaleWrapper::firstValueSince(microtime_t relMicros) {

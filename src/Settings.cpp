@@ -56,7 +56,7 @@ Settings::Settings() {
                 .purgeTargetTime = 500,
                 .grindTargetWeight = 16000,
                 .productivity = 2500,
-                .scaleCalibration = -1559.11,
+                .scaleCalibration = -1891.41,
                 .reactionTime = 450,
         };
     }
