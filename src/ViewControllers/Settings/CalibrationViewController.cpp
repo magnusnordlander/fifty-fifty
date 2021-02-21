@@ -27,25 +27,24 @@ void CalibrationViewController::viewWillBePushed(NavigationController *controlle
     BaseViewController::viewWillBePushed(controller);
 
     this->state = STATE_PRE_TARE;
-    this->scale->setAccurateMode(true);
 }
 
 void CalibrationViewController::viewWasPopped(NavigationController *controller) {
     BaseViewController::viewWasPopped(controller);
 
     this->state = STATE_PRE_TARE;
-    this->scale->setAccurateMode(false);
 }
 
 void CalibrationViewController::tick(U8G2 display) {
     BaseViewController::tick(display);
 
-    if (this->state == STATE_TARING && this->scale->getTareStatus()) {
+    if (this->state == STATE_TARING && this->scale->isValueStable(2000000, 15, 50)) {
+        this->scale->tare(2000000);
         this->state = STATE_TARED;
     }
 
-    if (this->state == STATE_MEASURING && this->scale->accuracyBufferFull()) {
-        this->settings->setScaleCalibration(this->scale->measureCalibrationValue(100.));
+    if (this->state == STATE_MEASURING && this->scale->isValueStable(2000000, 15, 50)) {
+        this->settings->setScaleCalibration(this->scale->measureCalibrationValue(100., 2000000));
         this->navigationController->pop();
     }
 }
@@ -54,10 +53,8 @@ void CalibrationViewController::handleButtonEvent(ButtonEvent event) {
     if (event == BUTTON_LET_UP) {
         if (this->state == STATE_PRE_TARE) {
             this->state = STATE_TARING;
-            this->scale->tareNoDelay();
         } else if (this->state == STATE_TARED) {
             this->state = STATE_MEASURING;
-            this->scale->clearAccuracyBuffer();
         }
     }
 }

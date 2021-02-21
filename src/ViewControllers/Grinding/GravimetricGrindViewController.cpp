@@ -16,7 +16,8 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 void GravimetricGrindViewController::tick(U8G2 display) {
     BaseGrindViewController::tick(display);
 
-    if (this->taring && this->scale->getTareStatus()) {
+    if (this->taring && this->scale->isValueStable(2000000, 15, 50)) {
+        this->scale->tare(2000000);
         this->taring = false;
         this->grinding = true;
     }
@@ -62,6 +63,10 @@ void GravimetricGrindViewController::render(U8G2 display) {
 }
 
 void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
+    if (this->scale->isValueStable(1000000, 5, 200)) {
+        drawStabilityMarker(display);
+    }
+
     display.setFontMode(1);
     display.setDrawColor(2);
 
@@ -74,16 +79,19 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
         display.drawStr(40,56, "Done");
         drawLargeFloatWithUnits(display, (float)(ground_mg)/1000., "g", 32, 5, 1);
     } else {
-        display.drawStr(32,56, "Grinding");
+        display.drawStr(24,56, "Grinding");
         drawLargeFloatWithUnits(display, (float)(remaining_mg)/1000., "g", 32, 5, 1);
 
         display.setFont(u8g2_font_ncenB08_tr);
 
         char weight_as_string[10];
-        dtostrf(this->scale->getRateOfChange(), 3, 2, weight_as_string);
-        char target_weight_string[25];
-        snprintf(target_weight_string, sizeof(target_weight_string), "%s g/s", weight_as_string);
-        display.drawStr(0, 56, target_weight_string);
+        float roc = this->scale->getRateOfChange();
+        if (roc > -0.07 && roc < 0.07) {
+            roc = 0.;
+        }
+        dtostrf(roc, 3, 1, weight_as_string);
+        display.drawStr(108, 48, weight_as_string);
+        display.drawStr(108, 56, "g/s");
     }
 }
 
@@ -96,7 +104,6 @@ void GravimetricGrindViewController::renderTaringView(U8G2 display) {
 
 void GravimetricGrindViewController::startTare() {
     this->taring = true;
-    this->scale->tareNoDelay();
 }
 
 GravimetricGrindViewController::~GravimetricGrindViewController() {

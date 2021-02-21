@@ -9,7 +9,7 @@
 
 class GrindTargetWeightSettingViewController: public BaseSettingViewController {
 public:
-    GrindTargetWeightSettingViewController(Settings *settings);
+    explicit GrindTargetWeightSettingViewController(Settings *settings);
 
     void render(U8G2 display) override;
 

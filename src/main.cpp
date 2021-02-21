@@ -9,6 +9,7 @@
 #include "ViewControllers/Settings/GrindTimeSettingViewController.h"
 #include "ViewControllers/Settings/GrindTargetWeightSettingViewController.h"
 #include "ViewControllers/Settings/ReactionTimeSettingViewController.h"
+#include "ViewControllers/Settings/DebugViewController.h"
 #include "ViewControllers/Grinding/GravimetricGrindViewController.h"
 #include "ViewControllers/Settings/ProductivitySettingViewController.h"
 #include "ViewControllers/Settings/CalibrationViewController.h"
@@ -96,6 +97,7 @@ void setup(void) {
             new ViewControllerMenuItem("Reaction time", new ReactionTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
             new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
+            new ViewControllerMenuItem("Debug", new DebugViewController(scale)),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 

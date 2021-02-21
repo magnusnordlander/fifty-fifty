@@ -8,10 +8,13 @@
 #include <deque>
 #include <HX711_ADC.h>
 #include "Settings.h"
+#include <types.h>
+
+class DebugViewController;
 
 typedef struct {
-    float measuringPoint;
-    unsigned long microtime;
+    int32_t measuringPoint;
+    microtime_t microtime;
 } MeasuringPoint;
 
 class ScaleWrapper {
@@ -24,16 +27,12 @@ public:
     static ScaleWrapper *GetInstance(unsigned short doutPin, unsigned short clkPin, Settings* settings);
 
     void refresh();
-    void tare();
-    void tareNoDelay();
-    bool getTareStatus();
+    void tare(microtime_t micros = 1000000);
 
-    void setAccurateMode(bool accurateMode);
-    bool accuracyBufferFull();
-    void clearAccuracyBuffer();
-    float measureCalibrationValue(float knownMass);
+    float measureCalibrationValue(float knownMass, microtime_t relMicros = 100000);
 
-    float getLatestValue() const;
+    bool isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma);
+    float getLatestValue();
     float getRateOfChange();
 
     float getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);
@@ -41,11 +40,27 @@ public:
     static void dataReadyISR();
 private:
     Settings* settings;
-    HX711_ADC* scale;
 
-    volatile static boolean newDataReady;
+    pin_size_t doutPin, clkPin;
+
+    void init() const;
+    int32_t readRaw() const;
+    float convert(int32_t data) const;
+
+    int32_t averageLast(microtime_t relMicros);
+    MeasuringPoint firstValueSince(microtime_t relMicros);
+
+    int32_t tareValue = 0;
+    float calibrationValue = 0;
+
+    volatile static microtime_t dataReadAt;
+    volatile static int32_t latestData;
+
+    microtime_t latestRefreshed = 0;
 
     std::deque<MeasuringPoint>* latestValues;
+
+    friend class DebugViewController;
 };
 
 

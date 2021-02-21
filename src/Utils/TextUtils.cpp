@@ -42,3 +42,11 @@ void drawWeightApproximation(U8G2 display, float target_weight, unsigned short y
     snprintf(target_weight_string, sizeof(target_weight_string), "Approx. %s g", weight_as_string);
     display.drawStr(0, y, target_weight_string);
 }
+
+void drawStabilityMarker(U8G2 display) {
+    display.drawDisc(5, 5, 3);
+}
+
+void drawGrindRate(U8G2 display, float rate, unsigned short y) {
+
+}
