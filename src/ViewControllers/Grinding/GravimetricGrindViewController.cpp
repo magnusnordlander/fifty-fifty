@@ -67,7 +67,7 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
 
     display.setFont(u8g2_font_helvB12_te);
 
-    unsigned int ground_mg = (int)(this->scale->getLatestValue()*1000);
+    signed int ground_mg = (int)(this->scale->getLatestValue()*1000);
     signed int remaining_mg = this->target_mg - ground_mg;
 
     if (this->done) {
@@ -76,6 +76,14 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
     } else {
         display.drawStr(32,56, "Grinding");
         drawLargeFloatWithUnits(display, (float)(remaining_mg)/1000., "g", 32, 5, 1);
+
+        display.setFont(u8g2_font_ncenB08_tr);
+
+        char weight_as_string[10];
+        dtostrf(this->scale->getRateOfChange(), 3, 2, weight_as_string);
+        char target_weight_string[25];
+        snprintf(target_weight_string, sizeof(target_weight_string), "%s g/s", weight_as_string);
+        display.drawStr(0, 56, target_weight_string);
     }
 }
 

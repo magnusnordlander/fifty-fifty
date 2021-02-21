@@ -35,7 +35,8 @@ ScaleWrapper::ScaleWrapper(unsigned short doutPin, unsigned short clkPin, Settin
 void ScaleWrapper::refresh() {
     scale->setCalFactor(settings->getScaleCalibration());
 
-    if (newDataReady) {
+    if (ScaleWrapper::newDataReady) {
+        ScaleWrapper::newDataReady = false;
         this->latestValues->push_front((MeasuringPoint) {
             .measuringPoint=this->scale->getData(),
             .microtime=micros(),
