@@ -71,8 +71,8 @@ float ScaleWrapper::getRateOfChange() {
         return 0.;
     }
 
-    MeasuringPoint first = this->firstValueSince(1000000);
-    MeasuringPoint last = this->latestValues->front();
+    MeasuringPoint first = this->averagePointSince(1000000, 3);
+    MeasuringPoint last = this->latestAverage(3);
 
     microtime_t diff = last.microtime - first.microtime;
 
@@ -230,3 +230,50 @@ MeasuringPoint ScaleWrapper::firstValueSince(microtime_t relMicros) {
     return latestValues->back();
 }
 
+MeasuringPoint ScaleWrapper::averagePointSince(microtime_t relMicros, unsigned short num) {
+    microtime_t current = micros();
+
+    int32_t sum = 0;
+    unsigned short foundNum = 0;
+    microtime_t lastTime = 0;
+
+    for (unsigned int i = latestValues->size() - 1; i >= 0; i--) {
+        MeasuringPoint p = latestValues->at(i);
+        if (current - p.microtime <= relMicros) {
+            foundNum++;
+            sum += p.measuringPoint;
+            lastTime = p.microtime;
+
+            if (foundNum >= num) {
+                break;
+            }
+        }
+    }
+
+    if (foundNum == 0) {
+        return latestValues->back();
+    }
+
+    return MeasuringPoint{.measuringPoint=sum/foundNum, .microtime=lastTime};
+}
+
+MeasuringPoint ScaleWrapper::latestAverage(unsigned short num) {
+    int32_t sum = 0;
+    unsigned short foundNum = 0;
+    microtime_t lastTime = 0;
+
+    for (unsigned int i = 0; i < num; i++) {
+        if (i < latestValues->size()) {
+            MeasuringPoint p = latestValues->at(i);
+            foundNum++;
+            sum += p.measuringPoint;
+            lastTime = p.microtime;
+        }
+    }
+
+    if (foundNum == 0) {
+        return latestValues->front();
+    }
+
+    return MeasuringPoint{.measuringPoint=sum/foundNum, .microtime=lastTime};
+}
