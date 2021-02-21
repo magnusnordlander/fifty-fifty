@@ -55,18 +55,20 @@ MenuViewController::MenuViewController(std::vector<MenuItem*> items) {
 void MenuViewController::handleRotation(int encoderDiff) {
     unsigned int numMenuItems = this->menuItems.size();
 
+    microtime_t timeDiff = micros() - lastScrollEvent;
+
     bool direction = encoderDiff > 0;
-    if (direction != lastDirection && lastScrollEvent + MENU_SCROLL_DEAD_TIME_DIRECTION_SWITCH > micros()) {
+    if (direction != lastDirection && timeDiff <= MENU_SCROLL_DEAD_TIME_DIRECTION_SWITCH) {
         return;
     }
 
-    unsigned int deadTime = MENU_SCROLL_DEAD_TIME_MICROS;
+    microtime_t deadTime = MENU_SCROLL_DEAD_TIME_MICROS;
 
     if (abs(encoderDiff) >= MENU_DOUBLE_SCROLL_THRESHOLD) {
         deadTime = MENU_SCROLL_DOUBLE_SCROLL_DEAD_TIME_MICROS;
     }
 
-    if (lastScrollEvent + deadTime < micros()) {
+    if (timeDiff >= deadTime) {
         unsigned short steps = 1;
 
         if (direction) {

@@ -7,6 +7,7 @@
 
 #include "BaseGrindViewController.h"
 #include "Settings.h"
+#include <types.h>
 
 class PurgeViewController: public BaseGrindViewController {
 public:
@@ -22,7 +23,7 @@ public:
 protected:
     Settings* settings;
 
-    unsigned long target_ms = 0;
+    microtime_t target_ms = 0;
 };
 
 

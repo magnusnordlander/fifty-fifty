@@ -8,6 +8,7 @@
 #include <vector>
 #include "ViewControllers/BaseViewController.h"
 #include "MenuItem/MenuItem.h"
+#include <types.h>
 
 #define MENU_SCROLL_DEAD_TIME_MICROS 120000
 #define MENU_SCROLL_DOUBLE_SCROLL_DEAD_TIME_MICROS 30000
@@ -33,7 +34,7 @@ private:
     unsigned short currentSelection = 0;
     short overflow = 0;
 
-    unsigned long lastScrollEvent = 0;
+    microtime_t lastScrollEvent = 0;
     bool lastDirection = true;
 };
 

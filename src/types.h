@@ -6,6 +6,6 @@
 #define GRINDER_TYPES_H
 
 typedef unsigned long microtime_t;
-
+typedef unsigned long millitime_t;
 
 #endif //GRINDER_TYPES_H

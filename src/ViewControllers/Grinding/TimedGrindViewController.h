@@ -7,6 +7,7 @@
 
 #include "BaseGrindViewController.h"
 #include <Settings.h>
+#include <types.h>
 
 class TimedGrindViewController: public BaseGrindViewController {
 public:
@@ -23,7 +24,7 @@ public:
 protected:
     Settings* settings;
 
-    unsigned long target_ms = 0;
+    millitime_t target_ms = 0;
 };
 
 

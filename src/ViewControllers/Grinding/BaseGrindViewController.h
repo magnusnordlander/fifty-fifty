@@ -7,6 +7,7 @@
 
 #include "ViewControllers/BaseViewController.h"
 #include <SsrState.h>
+#include <types.h>
 
 class BaseGrindViewController: public BaseViewController {
 public:
@@ -22,13 +23,13 @@ public:
 
     void subviewWillBePushed(NavigationController *controller, BaseViewController *) override;
 
-    void setTemporaryTarget(unsigned long target);
+    void setTemporaryTarget(millitime_t target);
 
 protected:
     SsrState* ssr;
-    unsigned long startTime;
-    unsigned long elapsedMillis() const;
-    unsigned long temporary_target = 0;
+    millitime_t startTime;
+    millitime_t elapsedMillis() const;
+    millitime_t temporary_target = 0;
     bool grinding = false;
 };
 

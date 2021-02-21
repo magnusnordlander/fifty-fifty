@@ -40,7 +40,7 @@ void ScaleWrapper::refresh() {
     microtime_t lastAdded = ScaleWrapper::dataReadAt;
     int32_t d = ScaleWrapper::latestData;
 
-    if (latestRefreshed < lastAdded) {
+    if (lastAdded - latestRefreshed > 0) {
         this->latestValues->push_front((MeasuringPoint) {
             .measuringPoint=d,
             .microtime=lastAdded,
@@ -74,8 +74,10 @@ float ScaleWrapper::getRateOfChange() {
     MeasuringPoint first = this->firstValueSince(1000000);
     MeasuringPoint last = this->latestValues->front();
 
+    microtime_t diff = last.microtime - first.microtime;
+
     float weightDiff = this->convert(last.measuringPoint) - this->convert(first.measuringPoint);
-    auto timeDiff = (float)((double)(last.microtime - first.microtime) / 1000000.);
+    auto timeDiff = (float)((double)diff / 1000000.);
 
     return weightDiff / timeDiff;
 }
@@ -159,11 +161,11 @@ int32_t ScaleWrapper::averageLast(microtime_t relMicros) {
     long s = latestValues->size();
     long sum = 0;
     uint8_t valuesUsed = 0;
-    microtime_t threshold = micros() - relMicros;
+    microtime_t current = micros();
 
     for (int i = 0; i < s; i++) {
         MeasuringPoint p = latestValues->at(i);
-        if (p.microtime > threshold) {
+        if (current - p.microtime <= relMicros) {
             sum += p.measuringPoint;
             valuesUsed++;
         }
@@ -186,11 +188,11 @@ float ScaleWrapper::scaleStandardDeviation(microtime_t relMicros, unsigned short
     long s = latestValues->size();
     long sum = 0;
     uint8_t valuesUsed = 0;
-    microtime_t threshold = micros() - relMicros;
+    microtime_t current = micros();
 
     for (int i = 0; i < s; i++) {
         MeasuringPoint p = latestValues->at(i);
-        if (p.microtime > threshold) {
+        if (current - p.microtime <= relMicros) {
             sum += p.measuringPoint;
             valuesUsed++;
         }
@@ -205,20 +207,22 @@ float ScaleWrapper::scaleStandardDeviation(microtime_t relMicros, unsigned short
 
     for (int i = 0; i < s; i++) {
         MeasuringPoint p = latestValues->at(i);
-        if (p.microtime > threshold) {
+        if (current - p.microtime <= relMicros) {
             sd += pow(p.measuringPoint - mean, 2);
         }
     }
 
     float val = sqrt(sd/(float)valuesUsed);
+
+    return val;
 }
 
 MeasuringPoint ScaleWrapper::firstValueSince(microtime_t relMicros) {
-    microtime_t threshold = micros() - relMicros;
+    microtime_t current = micros();
 
     for (unsigned int i = latestValues->size() - 1; i >= 0; i--) {
         MeasuringPoint p = latestValues->at(i);
-        if (p.microtime > threshold) {
+        if (current - p.microtime <= relMicros) {
             return p;
         }
     }

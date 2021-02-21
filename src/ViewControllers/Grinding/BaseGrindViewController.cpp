@@ -26,12 +26,12 @@ BaseGrindViewController::BaseGrindViewController(SsrState *ssr) : ssr(ssr) {
     this->startTime = 0;
 }
 
-void BaseGrindViewController::setTemporaryTarget(unsigned long target) {
+void BaseGrindViewController::setTemporaryTarget(millitime_t target) {
     this->temporary_target = target;
 }
 
 
-unsigned long BaseGrindViewController::elapsedMillis() const {
+millitime_t BaseGrindViewController::elapsedMillis() const {
     return millis() - this->startTime;
 }
 

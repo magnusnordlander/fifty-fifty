@@ -7,6 +7,7 @@
 
 #include "BaseGrindViewController.h"
 #include "SsrState.h"
+#include <types.h>
 
 class ManualGrindViewController: public BaseGrindViewController {
 public:

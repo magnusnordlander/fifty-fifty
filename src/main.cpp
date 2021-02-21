@@ -24,6 +24,7 @@
 #include "Settings.h"
 #include "ScaleWrapper.h"
 #include "ViewControllers/ButtonEvent.h"
+#include <types.h>
 
 // DT and CLK must be interrupt pins
 #define ENCODER_SW_PIN 4
@@ -46,6 +47,7 @@
 #define UEXT_I2C_SCL_PIN 19
 #define UEXT_I2C_SDA_PIN 18
 
+#define DEBUG_RIG
 
 #ifdef DEBUG_RIG
 #define SCROLL_DIRECTION 1
@@ -62,7 +64,7 @@ int Manual_Grind_State = HIGH;
 
 long Old_Encoder_Position  = 0;
 
-unsigned long Button_Press_Started_At = 0;
+microtime_t Button_Press_Started_At = 0;
 
 ButtonEvent currentButtonEvent = BUTTON_INACTIVE;
 
@@ -97,7 +99,7 @@ void setup(void) {
             new ViewControllerMenuItem("Reaction time", new ReactionTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
             new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
-            new ViewControllerMenuItem("Debug", new DebugViewController(scale)),
+            new ViewControllerMenuItem("Scale debug", new DebugViewController(scale)),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 
@@ -132,7 +134,7 @@ void updateExternalState() {
     } else if (Button_Press_Started_At > 0 && Encoder_SW_State == LOW) {
         currentButtonEvent = BUTTON_HOLD;
     } else if (Button_Press_Started_At > 0 && Encoder_SW_State == HIGH) {
-        auto holdLength = micros() - Button_Press_Started_At;
+        microtime_t holdLength = micros() - Button_Press_Started_At;
         if (holdLength > 300000) {
             currentButtonEvent = BUTTON_PRESS_AND_HOLD_LET_UP;
         } else {
