@@ -10,10 +10,10 @@
 #include "MenuItem/MenuItem.h"
 #include <types.h>
 
-#define MENU_SCROLL_DEAD_TIME_MICROS 120000
+#define MENU_SCROLL_DEAD_TIME_MICROS 200000
 #define MENU_SCROLL_DOUBLE_SCROLL_DEAD_TIME_MICROS 30000
 #define MENU_SCROLL_DEAD_TIME_DIRECTION_SWITCH 500000
-#define MENU_DOUBLE_SCROLL_THRESHOLD 5
+#define MENU_DOUBLE_SCROLL_THRESHOLD 4
 
 class MenuViewController: public BaseViewController {
 public:
