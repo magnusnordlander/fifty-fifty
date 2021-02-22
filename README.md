@@ -9,7 +9,9 @@ This project is in use and development.
 ### Upcoming Rev B changes
 * Possibly SMD components (except the Arduino, obviously)
 * Populate the entire UEXT header, allowing for SPI displays
-* Load cell interface
+* Load cell interface - ADS1232
+  * Possible 5V regulator: L7805CDT-TR (for increased accuracy, though 3V3 seems very feasible)
+  * Possibly use an RC filter to filter REFP, REFN, AINP1 and AINN1
 
 ## Overview
 
