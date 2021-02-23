@@ -18,7 +18,7 @@ void ScaleViewController::render(U8G2 display) {
     } else {
         drawLargeFloatWithUnits(display, this->scale->getLatestValue(), "g", 42);
 
-        if (this->scale->isValueStable(1000000, 5, 200)) {
+        if (this->scale->isValueStableLowAccuracy()) {
             drawStabilityMarker(display);
             display.setFont(u8g2_font_ncenB08_tr);
             display.drawStr(42,56, "Stable");
@@ -35,7 +35,7 @@ void ScaleViewController::handleButtonEvent(ButtonEvent event) {
 }
 
 void ScaleViewController::tick(U8G2 display) {
-    if (this->taring && this->scale->isValueStable(2000000, 15, 75)) {
+    if (this->taring && this->scale->isValueStableHighAccuracy()) {
         this->scale->tare(2000000);
         this->taring = false;
     }

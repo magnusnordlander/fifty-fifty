@@ -16,7 +16,7 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 void GravimetricGrindViewController::tick(U8G2 display) {
     BaseGrindViewController::tick(display);
 
-    if (this->taring && this->scale->isValueStable(2000000, 15, 75)) {
+    if (this->taring && this->scale->isValueStableHighAccuracy()) {
         this->scale->tare(2000000);
         this->taring = false;
         this->grinding = true;
@@ -63,7 +63,7 @@ void GravimetricGrindViewController::render(U8G2 display) {
 }
 
 void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
-    if (this->scale->isValueStable(1000000, 5, 200)) {
+    if (this->scale->isValueStableLowAccuracy()) {
         drawStabilityMarker(display);
     }
 

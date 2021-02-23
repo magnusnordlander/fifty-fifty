@@ -2,15 +2,15 @@
 // Created by Magnus Nordlander on 2021-02-21.
 //
 
-#ifndef GRINDER_DEBUGVIEWCONTROLLER_H
-#define GRINDER_DEBUGVIEWCONTROLLER_H
+#ifndef GRINDER_SCALEDEBUGVIEWCONTROLLER_H
+#define GRINDER_SCALEDEBUGVIEWCONTROLLER_H
 
 #include <ViewControllers/BaseViewController.h>
 #include <ScaleWrapper.h>
 
-class DebugViewController: public BaseViewController {
+class ScaleDebugViewController: public BaseViewController {
 public:
-    explicit DebugViewController(ScaleWrapper* scale);
+    explicit ScaleDebugViewController(ScaleWrapper* scale);
 
     void render(U8G2 display) override;
 
@@ -20,4 +20,4 @@ private:
 };
 
 
-#endif //GRINDER_DEBUGVIEWCONTROLLER_H
+#endif //GRINDER_SCALEDEBUGVIEWCONTROLLER_H

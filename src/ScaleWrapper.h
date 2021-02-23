@@ -10,7 +10,11 @@
 #include "Settings.h"
 #include <types.h>
 
-class DebugViewController;
+#define SPEED 80
+#define LATEST_VALUE_SIZE 400
+
+
+class ScaleDebugViewController;
 
 typedef struct {
     int32_t measuringPoint;
@@ -19,19 +23,20 @@ typedef struct {
 
 class ScaleWrapper {
 protected:
-    ScaleWrapper(unsigned short doutPin, unsigned short clkPin, Settings* settings);
+    ScaleWrapper(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdwnPin, Settings* settings);
 
     static ScaleWrapper* singleton_;
 
 public:
-    static ScaleWrapper *GetInstance(unsigned short doutPin, unsigned short clkPin, Settings* settings);
+    static ScaleWrapper *GetInstance(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdwnPin, Settings* settings);
 
     void refresh();
     void tare(microtime_t micros = 1000000);
 
     float measureCalibrationValue(float knownMass, microtime_t relMicros = 100000);
 
-    bool isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma);
+    bool isValueStableHighAccuracy();
+    bool isValueStableLowAccuracy();
     float getLatestValue();
     float getRateOfChange();
 
@@ -41,7 +46,7 @@ public:
 private:
     Settings* settings;
 
-    pin_size_t doutPin, clkPin;
+    pin_size_t doutPin, clkPin, pdwnPin;
 
     void init() const;
     int32_t readRaw() const;
@@ -53,18 +58,23 @@ private:
     MeasuringPoint latestAverage(unsigned short num);
 
     float scaleStandardDeviation(microtime_t relMicros, unsigned short minValues);
+    bool isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma);
+    microtime_t bufSize();
+    MeasuringPoint min();
+    MeasuringPoint max();
 
     int32_t tareValue = 0;
     float calibrationValue = 0;
 
-    volatile static microtime_t dataReadAt;
-    volatile static int32_t latestData;
+    MeasuringPoint safeData[LATEST_VALUE_SIZE];
+    uint16_t safeHead = 0;
+    bool safeFilledOnce = false;
 
     microtime_t latestRefreshed = 0;
 
     std::deque<MeasuringPoint>* latestValues;
 
-    friend class DebugViewController;
+    friend class ScaleDebugViewController;
 };
 
 

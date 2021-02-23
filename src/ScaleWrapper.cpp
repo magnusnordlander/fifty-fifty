@@ -4,57 +4,96 @@
 
 #include "ScaleWrapper.h"
 #include <cmath>
-
-#define LATEST_VALUE_SIZE 50
+#include <SimplyAtomic.h>
 
 ScaleWrapper* ScaleWrapper::singleton_= nullptr;
 
-volatile microtime_t ScaleWrapper::dataReadAt = 0;
-volatile int32_t ScaleWrapper::latestData = 0;
+volatile MeasuringPoint allData[LATEST_VALUE_SIZE];
+volatile uint16_t head = 0;
+volatile bool filledOnce = false;
 
 //interrupt routine:
 void ScaleWrapper::dataReadyISR() {
     microtime_t conversionStartTime = micros();
     int32_t data = ScaleWrapper::singleton_->readRaw();
 
-    ScaleWrapper::dataReadAt = conversionStartTime;
-    ScaleWrapper::latestData = data;
+    MeasuringPoint mp = (MeasuringPoint){
+        .measuringPoint = data,
+        .microtime = conversionStartTime,
+    };
+
+    memcpy((void*)(allData + head), &mp, sizeof(mp));
+
+    if (!filledOnce && head == LATEST_VALUE_SIZE - 1) {
+        filledOnce = true;
+    }
+
+    head = (head + 1) % LATEST_VALUE_SIZE;
 }
 
-ScaleWrapper::ScaleWrapper(unsigned short doutPin, unsigned short clkPin, Settings* settings) {
+ScaleWrapper::ScaleWrapper(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdwnPin, Settings* settings) {
+    this->pdwnPin = pdwnPin;
     this->doutPin = doutPin;
     this->clkPin = clkPin;
-
-    this->init();
 
     this->settings = settings;
     this->calibrationValue = settings->getScaleCalibration();
     this->latestValues = new std::deque<MeasuringPoint>;
 
-    attachInterrupt(digitalPinToInterrupt(doutPin), dataReadyISR, FALLING);
+    this->init();
 
+    attachInterrupt(digitalPinToInterrupt(doutPin), dataReadyISR, FALLING);
 }
 
 void ScaleWrapper::refresh() {
-    // Grab a copy immediately so that data doesn't change while we're working on it.
-    microtime_t lastAdded = ScaleWrapper::dataReadAt;
-    int32_t d = ScaleWrapper::latestData;
+    // Grab a copy atomically so that data doesn't change while we're working on it.
+    // The interrupt status register will be saved here
+    ATOMIC()
+    {
+        memcpy(safeData, (void*)allData, sizeof(allData));
+        safeHead = head;
+        safeFilledOnce = filledOnce;
+    }
+    // The interrupt status register will be restored here
 
-    if (lastAdded - latestRefreshed > 0) {
-        this->latestValues->push_front((MeasuringPoint) {
-            .measuringPoint=d,
-            .microtime=lastAdded,
-        });
+    // Fugly hack while I rewrite this to not use std::deque
+    this->latestValues->clear();
 
-        if (this->latestValues->size() > LATEST_VALUE_SIZE) {
-            this->latestValues->pop_back();
+    MeasuringPoint prev;
+    bool add = false;
+
+    if (!safeFilledOnce) {
+        for (unsigned int i = 0; i < safeHead; ++i) {
+            if (add) {
+                this->latestValues->push_front((MeasuringPoint){
+                        .measuringPoint = (prev.measuringPoint + safeData[i].measuringPoint) / 2,
+                        .microtime = safeData[i].microtime,
+                });
+            }
+
+            prev = safeData[i];
+            add = true;
         }
+    } else {
+        uint16_t i = safeHead % LATEST_VALUE_SIZE;
+        do {
+            if (add) {
+                this->latestValues->push_front((MeasuringPoint){
+                        .measuringPoint = (prev.measuringPoint + safeData[i].measuringPoint) / 2,
+                        .microtime = safeData[i].microtime,
+                });
+            }
 
-        latestRefreshed = lastAdded;
+            prev = safeData[i];
+            add = true;
+            i = (i + 1) % LATEST_VALUE_SIZE;
+        } while (i != safeHead);
+    }
 
-        if (this->tareValue == 0 && this->isValueStable(1000000, 5, 200)) {
-            this->tare(1000000);
-        }
+    latestRefreshed = this->latestValues->front().microtime;
+
+    if (this->tareValue == 0 && this->isValueStableHighAccuracy()) {
+        this->tare(1000000);
     }
 }
 
@@ -63,7 +102,7 @@ void ScaleWrapper::tare(microtime_t rel_micros) {
 }
 
 float ScaleWrapper::getLatestValue() {
-    return this->convert(this->latestValues->front().measuringPoint);
+    return this->convert(this->latestAverage(SPEED/10).measuringPoint);
 }
 
 float ScaleWrapper::getRateOfChange() {
@@ -71,8 +110,8 @@ float ScaleWrapper::getRateOfChange() {
         return 0.;
     }
 
-    MeasuringPoint first = this->averagePointSince(1000000, 3);
-    MeasuringPoint last = this->latestAverage(3);
+    MeasuringPoint first = this->averagePointSince(1000000, 24);
+    MeasuringPoint last = this->latestAverage(24);
 
     microtime_t diff = last.microtime - first.microtime;
 
@@ -95,9 +134,9 @@ float ScaleWrapper::getReactionCompensatedLatestValue(unsigned short reactionTim
     return latestValue + rateOfChange*reactionTimeSeconds;
 }
 
-ScaleWrapper *ScaleWrapper::GetInstance(unsigned short doutPin, unsigned short clkPin, Settings *settings) {
+ScaleWrapper *ScaleWrapper::GetInstance(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdwnPin, Settings *settings) {
     if(singleton_==nullptr){
-        singleton_ = new ScaleWrapper(doutPin, clkPin, settings);
+        singleton_ = new ScaleWrapper(doutPin, clkPin, pdwnPin, settings);
     }
     return singleton_;
 }
@@ -111,44 +150,42 @@ float ScaleWrapper::measureCalibrationValue(float knownMass, microtime_t relMicr
 }
 
 void ScaleWrapper::init() const {
+    pinMode(this->pdwnPin, OUTPUT);
     pinMode(this->clkPin, OUTPUT);
     pinMode(this->doutPin, INPUT);
 
-    digitalWrite(this->clkPin, LOW);
+    digitalWrite(this->pdwnPin, LOW);
+
+    delay(1);
+
+    digitalWrite(this->pdwnPin, HIGH);
 }
 
 int32_t ScaleWrapper::readRaw() const {
-    uint8_t sckPin = this->clkPin;
-    uint8_t doutPin = this->doutPin;
-
-    // Gain is 128, which means read one extra bit
-    uint8_t gain = 1;
+    pin_size_t clk = ScaleWrapper::singleton_->clkPin;
+    pin_size_t dout = ScaleWrapper::singleton_->doutPin;
 
     int32_t data = 0;
-    uint8_t dout;
 
-    for (uint8_t i = 0; i < (24 + gain); i++)
-    { //read 24 bit data + set gain and start next conversion
-        digitalWrite(sckPin, HIGH);
-        digitalWrite(sckPin, LOW);
-        if (i < (24))
-        {
-            dout = digitalRead(doutPin);
-            data = (data << 1) | dout;
-        }
+    // Read 24 bits
+    for(int i=23 ; i >= 0; i--) {
+        digitalWrite(clk, HIGH);
+        data = (data << 1) + digitalRead(dout);
+        digitalWrite(clk, LOW);
     }
 
-    /*
-    The HX711 output range is min. 0x800000 and max. 0x7FFFFF (the value rolls over).
-    In order to convert the range to min. 0x000000 and max. 0xFFFFFF,
-    the 24th bit must be changed from 0 to 1 or from 1 to 0.
-    */
-    data = data ^ 0x800000; // flip the 24th bit
+    /* Bit 23 is acutally the sign bit. Shift by 8 to get it to the
+     * right position (31), divide by 256 to restore the correct value.
+     */
+    data = (data << 8) / 256;
 
-    if (data > 0xFFFFFF)
-    {
-        //Serial.println("dataOutOfRange");
-    }
+    /* The data pin now is high or low depending on the last bit that
+     * was read.
+     * To get it to the default state (high) we toggle the clock one
+     * more time (see datasheet).
+     */
+    digitalWrite(clk, HIGH);
+    digitalWrite(clk, LOW);
 
     return data;
 }
@@ -178,11 +215,21 @@ int32_t ScaleWrapper::averageLast(microtime_t relMicros) {
     return sum / valuesUsed;
 }
 
+bool ScaleWrapper::isValueStableHighAccuracy() {
+    return this->isValueStable(2000000, 5, 250);
+}
+
+bool ScaleWrapper::isValueStableLowAccuracy() {
+    return this->isValueStable(500000, 5, 1000);
+}
+
 bool ScaleWrapper::isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma) {
     float val = this->scaleStandardDeviation(relMicros, minValues);
 
     return val < sigma;
 }
+
+
 
 float ScaleWrapper::scaleStandardDeviation(microtime_t relMicros, unsigned short minValues) {
     long s = latestValues->size();
@@ -212,9 +259,7 @@ float ScaleWrapper::scaleStandardDeviation(microtime_t relMicros, unsigned short
         }
     }
 
-    float val = sqrt(sd/(float)valuesUsed);
-
-    return val;
+    return sqrt(sd/(float)valuesUsed);
 }
 
 MeasuringPoint ScaleWrapper::firstValueSince(microtime_t relMicros) {
@@ -276,4 +321,40 @@ MeasuringPoint ScaleWrapper::latestAverage(unsigned short num) {
     }
 
     return MeasuringPoint{.measuringPoint=sum/foundNum, .microtime=lastTime};
+}
+
+microtime_t ScaleWrapper::bufSize() {
+    return this->latestValues->front().microtime - this->latestValues->back().microtime;
+}
+
+MeasuringPoint ScaleWrapper::min() {
+    MeasuringPoint val = (MeasuringPoint){
+        .measuringPoint = 99999999,
+        .microtime = 0
+    };
+
+    for (int i = 0; i < latestValues->size(); i++) {
+        MeasuringPoint p = latestValues->at(i);
+        if (p.measuringPoint < val.measuringPoint) {
+            val = p;
+        }
+    }
+
+    return val;
+}
+
+MeasuringPoint ScaleWrapper::max() {
+    MeasuringPoint val = (MeasuringPoint){
+            .measuringPoint = 0,
+            .microtime = 0
+    };
+
+    for (int i = 0; i < latestValues->size(); i++) {
+        MeasuringPoint p = latestValues->at(i);
+        if (p.measuringPoint > val.measuringPoint) {
+            val = p;
+        }
+    }
+
+    return val;
 }

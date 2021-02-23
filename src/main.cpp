@@ -9,10 +9,11 @@
 #include "ViewControllers/Settings/GrindTimeSettingViewController.h"
 #include "ViewControllers/Settings/GrindTargetWeightSettingViewController.h"
 #include "ViewControllers/Settings/ReactionTimeSettingViewController.h"
-#include "ViewControllers/Settings/DebugViewController.h"
+#include "ViewControllers/Settings/ScaleDebugViewController.h"
 #include "ViewControllers/Grinding/GravimetricGrindViewController.h"
 #include "ViewControllers/Settings/ProductivitySettingViewController.h"
 #include "ViewControllers/Settings/CalibrationViewController.h"
+#include "ViewControllers/Settings/PerformanceDebugViewController.h"
 #include "ViewControllers/Grinding/PurgeViewController.h"
 #include "ViewControllers/Grinding/TimedGrindViewController.h"
 #include "ViewControllers/ScaleViewController.h"
@@ -35,9 +36,10 @@
 
 #define SSR_PIN 15
 
-// DOUT and CLK must be interrupt pins
-#define HX711_DOUT_PIN 9
-#define HX711_CLK_PIN 10
+// DOUT must be interrupt pin
+#define ADS1232_PWDN_PIN 8
+#define ADS1232_DOUT_PIN 9
+#define ADS1232_SCLK_PIN 10
 
 // With the exception of CS, these pins are hardware supported
 #define UEXT_SPI_CS_PIN 16
@@ -46,6 +48,7 @@
 #define UEXT_SPI_MOSI_PIN 11
 #define UEXT_I2C_SCL_PIN 19
 #define UEXT_I2C_SDA_PIN 18
+
 
 #ifdef DEBUG_RIG
 #define SCROLL_DIRECTION 1
@@ -73,6 +76,8 @@ SsrState* ssr = nullptr;
 ManualGrindViewController* manualGrindView = nullptr;
 NavigationController* nav = nullptr;
 
+TimingStruct timings;
+
 void setup(void) {
     pinMode(MANUAL_GRIND_PIN, INPUT_PULLUP);
     pinMode(ENCODER_SW_PIN, INPUT_PULLUP);
@@ -80,13 +85,13 @@ void setup(void) {
     u8g2.begin();
 
     #ifdef DEBUG_RIG
-    Serial.begin(9600);
+    //Serial.begin(9600);
     #endif
 
     ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
 
-    scale = ScaleWrapper::GetInstance(HX711_DOUT_PIN, HX711_CLK_PIN, settings);
+    scale = ScaleWrapper::GetInstance(ADS1232_DOUT_PIN, ADS1232_SCLK_PIN, ADS1232_PWDN_PIN, settings);
 
     manualGrindView = new ManualGrindViewController(ssr);
 
@@ -97,7 +102,8 @@ void setup(void) {
             new ViewControllerMenuItem("Reaction time", new ReactionTimeSettingViewController(settings)),
             new ViewControllerMenuItem("Productivity", new ProductivitySettingViewController(settings)),
             new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
-            new ViewControllerMenuItem("Scale debug", new DebugViewController(scale)),
+            new ViewControllerMenuItem("Scale debug", new ScaleDebugViewController(scale)),
+            new ViewControllerMenuItem("Performance debug", new PerformanceDebugViewController()),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 
@@ -118,7 +124,7 @@ void updateExternalState() {
     if (new_encoder_position != Old_Encoder_Position) {
         Encoder_Diff = (new_encoder_position/4 - Old_Encoder_Position/4);
         #ifdef DEBUG_RIG
-        Serial.println(Encoder_Diff);
+        //Serial.println(Encoder_Diff);
         #endif
         Old_Encoder_Position = new_encoder_position;
     }
@@ -147,10 +153,14 @@ void updateExternalState() {
 }
 
 void loop(void) {
+    microtime_t start = micros();
+
     BaseViewController* top = nav->top();
 
+    microtime_t externalStart = micros();
     updateExternalState();
 
+    microtime_t manualStart = micros();
     // Handle manual grind state
     if (top != manualGrindView && Manual_Grind_State == LOW) {
         nav->push(manualGrindView);
@@ -158,13 +168,27 @@ void loop(void) {
         nav->pop();
     }
 
+    microtime_t buttonStart = micros();
     nav->top()->handleButtonEvent(currentButtonEvent);
 
+    microtime_t rotationStart = micros();
     if (currentButtonEvent == BUTTON_INACTIVE) {
         if (Encoder_Diff != 0) {
             nav->top()->handleRotation(Encoder_Diff * SCROLL_DIRECTION);
         }
     }
 
+    microtime_t tickStart = micros();
     nav->top()->tick(u8g2);
+
+    microtime_t end = micros();
+
+    timings = (TimingStruct){
+        .external = manualStart - externalStart,
+        .manual = rotationStart - manualStart,
+        .rotation = buttonStart - rotationStart,
+        .button = tickStart - buttonStart,
+        .tick = end - tickStart,
+        .loop = end - start,
+    };
 }

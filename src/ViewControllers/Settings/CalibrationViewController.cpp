@@ -38,12 +38,12 @@ void CalibrationViewController::viewWasPopped(NavigationController *controller) 
 void CalibrationViewController::tick(U8G2 display) {
     BaseViewController::tick(display);
 
-    if (this->state == STATE_TARING && this->scale->isValueStable(2000000, 15, 50)) {
+    if (this->state == STATE_TARING && this->scale->isValueStableHighAccuracy()) {
         this->scale->tare(2000000);
         this->state = STATE_TARED;
     }
 
-    if (this->state == STATE_MEASURING && this->scale->isValueStable(2000000, 15, 50)) {
+    if (this->state == STATE_MEASURING && this->scale->isValueStableHighAccuracy()) {
         this->settings->setScaleCalibration(this->scale->measureCalibrationValue(100., 2000000));
         this->navigationController->pop();
     }
