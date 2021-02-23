@@ -26,6 +26,8 @@ protected:
     ScaleWrapper* scale;
 
     boolean taring = false;
+    float displayValue = 0.;
+    uint8_t tickCounter = 0;
 
     ProgressBarView* progressBar;
 };
