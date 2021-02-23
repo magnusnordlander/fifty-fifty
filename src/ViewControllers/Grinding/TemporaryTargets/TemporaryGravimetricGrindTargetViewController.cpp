@@ -6,7 +6,7 @@
 #include <Utils/TextUtils.h>
 
 TemporaryGravimetricGrindTargetViewController::TemporaryGravimetricGrindTargetViewController(Settings *settings, GravimetricGrindViewController* gravimetricGrindViewController): BaseTemporaryGrindTargetViewController(settings), gravimetricGrindViewController(gravimetricGrindViewController) {
-    this->settingSensitivity = 20;
+    this->settingSensitivity = 80;
 }
 
 void TemporaryGravimetricGrindTargetViewController::render(U8G2 display) {

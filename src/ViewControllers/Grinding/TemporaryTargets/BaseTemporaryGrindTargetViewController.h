@@ -18,7 +18,7 @@ public:
 
 protected:
     unsigned short target = 0;
-    unsigned short settingSensitivity = 4;
+    unsigned short settingSensitivity = 16;
     Settings* settings;
 };
 

@@ -116,7 +116,7 @@ void updateExternalState() {
     Encoder_Diff = 0;
     long new_encoder_position = myEnc.read();
     if (new_encoder_position != Old_Encoder_Position) {
-        Encoder_Diff = (new_encoder_position - Old_Encoder_Position);
+        Encoder_Diff = (new_encoder_position/4 - Old_Encoder_Position/4);
         #ifdef DEBUG_RIG
         Serial.println(Encoder_Diff);
         #endif

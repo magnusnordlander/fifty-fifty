@@ -19,5 +19,5 @@ void GrindTargetWeightSettingViewController::stageTargetInSettings(unsigned shor
 
 GrindTargetWeightSettingViewController::GrindTargetWeightSettingViewController(Settings *settings)
         : BaseSettingViewController(settings) {
-    this->settingSensitivity = 20;
+    this->settingSensitivity = 80;
 }
