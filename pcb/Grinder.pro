@@ -1,4 +1,4 @@
-update=Friday, January 01, 2021 at 04:53:17 PM
+update=Wednesday, February 24, 2021 at 08:18:57 PM
 version=1
 last_client=kicad
 [general]
@@ -49,9 +49,9 @@ CopperTextUpright=1
 EdgeCutLineWidth=0.05
 CourtyardLineWidth=0.05
 OthersLineWidth=0.15
-OthersTextSizeV=1
-OthersTextSizeH=1
-OthersTextSizeThickness=0.15
+OthersTextSizeV=0.7
+OthersTextSizeH=0.7
+OthersTextSizeThickness=0.09999999999999999
 OthersTextItalic=0
 OthersTextUpright=1
 SolderMaskClearance=0
@@ -227,6 +227,28 @@ Enabled=0
 [pcbnew/Netclasses]
 [pcbnew/Netclasses/Default]
 Name=Default
+Clearance=0.2
+TrackWidth=0.25
+ViaDiameter=0.8
+ViaDrill=0.4
+uViaDiameter=0.3
+uViaDrill=0.1
+dPairWidth=0.2
+dPairGap=0.25
+dPairViaGap=0.25
+[pcbnew/Netclasses/1]
+Name=5V
+Clearance=0.2
+TrackWidth=0.25
+ViaDiameter=0.8
+ViaDrill=0.4
+uViaDiameter=0.3
+uViaDrill=0.1
+dPairWidth=0.2
+dPairGap=0.25
+dPairViaGap=0.25
+[pcbnew/Netclasses/2]
+Name=9V
 Clearance=0.2
 TrackWidth=0.25
 ViaDiameter=0.8
