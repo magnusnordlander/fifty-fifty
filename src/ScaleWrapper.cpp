@@ -114,8 +114,8 @@ float ScaleWrapper::getRateOfChange() {
         return 0.;
     }
 
-    MeasuringPoint first = this->averagePointSince(2000000, 40);
-    MeasuringPoint last = this->latestAverage(40);
+    MeasuringPoint first = this->averagePointSince(1000000, 10);
+    MeasuringPoint last = this->latestAverage(10);
 
     microtime_t diff = last.microtime - first.microtime;
 
