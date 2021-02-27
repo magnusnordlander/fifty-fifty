@@ -38,6 +38,7 @@ public:
     bool isValueStableHighAccuracy();
     bool isValueStableLowAccuracy();
     float getLatestValue();
+    float getLatestValue(microtime_t relMicros);
     float getRateOfChange();
 
     float getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);

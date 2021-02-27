@@ -16,6 +16,20 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 void GravimetricGrindViewController::tick(U8G2 display) {
     BaseGrindViewController::tick(display);
 
+    float latestWeight = this->scale->getLatestValue();
+    float latestRoc = this->scale->getRateOfChange();
+
+    if (tickCounter % 16 == 0 || fabs(latestWeight - displayValue) > 0.2) {
+        displayValue = latestWeight;
+    }
+
+    if (tickCounter % 16 == 0 || fabs(latestRoc - displayRoc) > 0.2) {
+        displayRoc = latestRoc;
+    }
+
+    tickCounter++;
+
+
     if (this->taring && this->scale->isValueStableHighAccuracy()) {
         this->scale->tare(2000000);
         this->taring = false;
@@ -72,7 +86,7 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
 
     display.setFont(u8g2_font_helvB12_te);
 
-    signed int ground_mg = (int)(this->scale->getLatestValue()*1000);
+    signed int ground_mg = (int)(displayValue*1000);
     signed int remaining_mg = this->target_mg - ground_mg;
 
     if (this->done) {
@@ -85,7 +99,7 @@ void GravimetricGrindViewController::renderGrindingView(U8G2 display) {
         display.setFont(u8g2_font_ncenB08_tr);
 
         char weight_as_string[10];
-        float roc = this->scale->getRateOfChange();
+        float roc = displayRoc;
         if (roc > -0.07 && roc < 0.07) {
             roc = 0.;
         }

@@ -22,7 +22,7 @@ void ScaleWrapper::dataReadyISR() {
         .microtime = conversionStartTime,
     };
 
-    memcpy((void*)(allData + head), &mp, sizeof(mp));
+    memcpy((void*)&(allData[head]), &mp, sizeof(mp));
 
     if (!filledOnce && head == LATEST_VALUE_SIZE - 1) {
         filledOnce = true;
@@ -75,7 +75,7 @@ void ScaleWrapper::refresh() {
             add = true;
         }
     } else {
-        uint16_t i = safeHead % LATEST_VALUE_SIZE;
+        uint16_t i = safeHead;
         do {
             if (add) {
                 this->latestValues->push_front((MeasuringPoint){
@@ -105,13 +105,17 @@ float ScaleWrapper::getLatestValue() {
     return this->convert(this->latestAverage(SPEED/10).measuringPoint);
 }
 
+float ScaleWrapper::getLatestValue(microtime_t relMicros) {
+    return this->convert(this->averageLast(relMicros));
+}
+
 float ScaleWrapper::getRateOfChange() {
     if (this->latestValues->size() < 2) {
         return 0.;
     }
 
-    MeasuringPoint first = this->averagePointSince(1000000, 24);
-    MeasuringPoint last = this->latestAverage(24);
+    MeasuringPoint first = this->averagePointSince(2000000, 40);
+    MeasuringPoint last = this->latestAverage(40);
 
     microtime_t diff = last.microtime - first.microtime;
 

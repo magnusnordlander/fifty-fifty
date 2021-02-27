@@ -42,6 +42,10 @@ private:
 
     unsigned long target_mg = 0;
     unsigned short reaction_time = 0;
+
+    float displayValue = 0.;
+    float displayRoc = 0.;
+    uint8_t tickCounter = 0;
 };
 
 
