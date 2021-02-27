@@ -333,7 +333,7 @@ MeasuringPoint ScaleWrapper::min() {
         .microtime = 0
     };
 
-    for (int i = 0; i < latestValues->size(); i++) {
+    for (unsigned int i = 0; i < latestValues->size(); i++) {
         MeasuringPoint p = latestValues->at(i);
         if (p.measuringPoint < val.measuringPoint) {
             val = p;
@@ -349,7 +349,7 @@ MeasuringPoint ScaleWrapper::max() {
             .microtime = 0
     };
 
-    for (int i = 0; i < latestValues->size(); i++) {
+    for (unsigned int i = 0; i < latestValues->size(); i++) {
         MeasuringPoint p = latestValues->at(i);
         if (p.measuringPoint > val.measuringPoint) {
             val = p;
