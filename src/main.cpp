@@ -147,8 +147,6 @@ void updateExternalState() {
 }
 
 void loop(void) {
-    //Serial.println(scale->getLatestValue());
-
     BaseViewController* top = nav->top();
 
     updateExternalState();
@@ -160,11 +158,13 @@ void loop(void) {
         nav->pop();
     }
 
-    if (Encoder_Diff != 0) {
-        nav->top()->handleRotation(Encoder_Diff * SCROLL_DIRECTION);
-    }
-
     nav->top()->handleButtonEvent(currentButtonEvent);
+
+    if (currentButtonEvent == BUTTON_INACTIVE) {
+        if (Encoder_Diff != 0) {
+            nav->top()->handleRotation(Encoder_Diff * SCROLL_DIRECTION);
+        }
+    }
 
     nav->top()->tick(u8g2);
 }
