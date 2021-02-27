@@ -37,9 +37,9 @@
 #define SSR_PIN 15
 
 // DOUT must be interrupt pin
-#define ADS1232_PWDN_PIN 8
+#define ADS1232_PWDN_PIN 10
 #define ADS1232_DOUT_PIN 9
-#define ADS1232_SCLK_PIN 10
+#define ADS1232_SCLK_PIN 8
 
 // With the exception of CS, these pins are hardware supported
 #define UEXT_SPI_CS_PIN 16
