@@ -57,6 +57,7 @@ private:
 
     int32_t averageLast(microtime_t relMicros);
     MeasuringPoint firstValueSince(microtime_t relMicros);
+    MeasuringPoint averagePointSince(microtime_t relMicros);
     MeasuringPoint averagePointSince(microtime_t relMicros, unsigned short num);
     MeasuringPoint latestAverage(unsigned short num);
     float _getRateOfChange();
