@@ -16,7 +16,7 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 void GravimetricGrindViewController::tick(U8G2 display) {
     BaseGrindViewController::tick(display);
 
-    float latestWeight = this->scale->getLatestWeightShortAverage();
+    float latestWeight = this->scale->getLatestWeightLongAverage();
     float latestRoc = this->scale->getRateOfChange();
 
     if (tickCounter % 16 == 0 || fabs(latestWeight - displayValue) > .4) {

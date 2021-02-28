@@ -12,7 +12,7 @@
 
 #define SPEED 80
 #define LATEST_VALUE_SIZE 400
-#define RATE_OF_CHANGE_HISTORY 5
+#define RATE_OF_CHANGE_HISTORY 10
 
 
 class ScaleDebugViewController;
