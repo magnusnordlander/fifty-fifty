@@ -39,6 +39,7 @@ ScaleWrapper::ScaleWrapper(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdw
     this->settings = settings;
     this->calibrationValue = settings->getScaleCalibration();
     this->latestValues = new std::deque<MeasuringPoint>;
+    this->previousRatesOfChange = new std::deque<float>;
 
     this->init();
 
@@ -92,6 +93,26 @@ void ScaleWrapper::refresh() {
 
     latestRefreshed = this->latestValues->front().microtime;
 
+    this->latestValue = this->latestValues->front();
+    this->latestValueShortAverage = this->averagePointSince(50000, 1);
+    this->latestValueLongAverage = this->averagePointSince(1000000, 1);
+
+    this->rateOfChange = this->_getRateOfChange();
+    this->previousRatesOfChange->push_front(this->rateOfChange);
+
+    if (this->previousRatesOfChange->size() > RATE_OF_CHANGE_HISTORY) {
+        this->previousRatesOfChange->pop_back();
+    }
+
+    double sum = 0;
+    for (float i : *this->previousRatesOfChange) {
+        sum += i;
+    }
+    this->averageRateOfChange = sum/this->previousRatesOfChange->size();
+    this->reactionCompensatedLatestWeight =
+            this->convert(this->latestValueShortAverage.measuringPoint)
+            + this->averageRateOfChange * ((float)this->settings->getReactionTime()/1000. + 0.025);
+
     if (this->tareValue == 0 && this->isValueStableHighAccuracy()) {
         this->tare(1000000);
     }
@@ -101,15 +122,27 @@ void ScaleWrapper::tare(microtime_t rel_micros) {
     this->tareValue = averageLast(rel_micros);
 }
 
-float ScaleWrapper::getLatestValue() {
+float ScaleWrapper::getLatestWeight() {
+    return this->convert(this->latestValue.measuringPoint);
+}
+
+float ScaleWrapper::getLatestWeightShortAverage() {
+    return this->convert(this->latestValueShortAverage.measuringPoint);
+}
+
+float ScaleWrapper::getLatestWeightLongAverage() {
+    return this->convert(this->latestValueLongAverage.measuringPoint);
+}
+
+float ScaleWrapper::_getLatestValue() {
     return this->convert(this->latestAverage(SPEED/10).measuringPoint);
 }
 
-float ScaleWrapper::getLatestValue(microtime_t relMicros) {
-    return this->convert(this->averageLast(relMicros));
+float ScaleWrapper::getRateOfChange() {
+    return averageRateOfChange;
 }
 
-float ScaleWrapper::getRateOfChange() {
+float ScaleWrapper::_getRateOfChange() {
     if (this->latestValues->size() < 2) {
         return 0.;
     }
@@ -125,9 +158,13 @@ float ScaleWrapper::getRateOfChange() {
     return weightDiff / timeDiff;
 }
 
-float ScaleWrapper::getReactionCompensatedLatestValue(unsigned short reactionTimeMillis) {
-    float rateOfChange = this->getRateOfChange();
-    float latestValue = this->getLatestValue();
+float ScaleWrapper::getReactionCompensatedLatestWeight() const {
+    return reactionCompensatedLatestWeight;
+}
+
+float ScaleWrapper::_getReactionCompensatedLatestValue(unsigned short reactionTimeMillis) {
+    float rateOfChange = this->_getRateOfChange();
+    float latestValue = this->_getLatestValue();
 
     if (rateOfChange < 0.01) {
         return latestValue;
