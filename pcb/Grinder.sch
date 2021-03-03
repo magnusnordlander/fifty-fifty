@@ -140,10 +140,10 @@ Wire Wire Line
 Wire Notes Line
 	8850 5750 11200 5750
 $Comp
-L Transistor_FET:IRLZ44N Q0
+L Transistor_FET:IRLZ44N Q1
 U 1 1 604139EB
 P 7400 1250
-F 0 "Q0" H 7604 1296 50  0000 L CNN
+F 0 "Q1" H 7604 1296 50  0000 L CNN
 F 1 "IRLZ44N" H 7604 1205 50  0000 L CNN
 F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 7650 1175 50  0001 L CIN
 F 3 "http://www.irf.com/product-info/datasheets/data/irlz44n.pdf" H 7400 1250 50  0001 L CNN
