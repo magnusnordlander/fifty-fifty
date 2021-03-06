@@ -34,30 +34,29 @@
 
 #define MANUAL_GRIND_PIN 14
 
-#define SSR_PIN 15
+#define SSR_PIN 21
 
 // DOUT must be interrupt pin
-#define ADS1232_PWDN_PIN 10
-#define ADS1232_DOUT_PIN 9
-#define ADS1232_SCLK_PIN 8
+#define ADS1232_PWDN_PIN 17
+#define ADS1232_DOUT_PIN 15
+#define ADS1232_SCLK_PIN 16
+#define ADS1232_TEMP_PIN 6
+#define ADS1232_A0_PIN 7
+#define ADS1232_GAIN0_PIN 8
+#define ADS1232_GAIN1_PIN 9
+#define ADS1232_SPEED_PIN 20
 
 // With the exception of CS, these pins are hardware supported
-#define UEXT_SPI_CS_PIN 16
+#define UEXT_SPI_CS_PIN 10
 #define UEXT_SPI_SCK_PIN 13
 #define UEXT_SPI_MISO_PIN 12
 #define UEXT_SPI_MOSI_PIN 11
 #define UEXT_I2C_SCL_PIN 19
 #define UEXT_I2C_SDA_PIN 18
 
-
-#ifdef DEBUG_RIG
-#define SCROLL_DIRECTION 1
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
-#else
 #define SCROLL_DIRECTION 1
 // Use I2C SCL as SSD1309 DC and I2C SDA as SSD1309 RES
 U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS_PIN, UEXT_I2C_SCL_PIN, UEXT_I2C_SDA_PIN);
-#endif
 
 int Encoder_SW_State = 0;
 long Encoder_Diff = 0;
@@ -90,6 +89,18 @@ void setup(void) {
 
     ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
+
+    pinMode(ADS1232_TEMP_PIN, OUTPUT);
+    pinMode(ADS1232_A0_PIN, OUTPUT);
+    pinMode(ADS1232_GAIN0_PIN, OUTPUT);
+    pinMode(ADS1232_GAIN1_PIN, OUTPUT);
+    pinMode(ADS1232_SPEED_PIN, OUTPUT);
+
+    digitalWrite(ADS1232_TEMP_PIN, LOW);
+    digitalWrite(ADS1232_A0_PIN, LOW);
+    digitalWrite(ADS1232_GAIN0_PIN, HIGH);
+    digitalWrite(ADS1232_GAIN1_PIN, HIGH);
+    digitalWrite(ADS1232_SPEED_PIN, HIGH);
 
     scale = ScaleWrapper::GetInstance(ADS1232_DOUT_PIN, ADS1232_SCLK_PIN, ADS1232_PWDN_PIN, settings);
 
