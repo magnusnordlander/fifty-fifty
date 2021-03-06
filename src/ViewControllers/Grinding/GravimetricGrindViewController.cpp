@@ -34,9 +34,7 @@ void GravimetricGrindViewController::tick(U8G2 display) {
         this->scale->tare(2000000);
         this->taring = false;
         this->grinding = true;
-    }
-
-    if (!this->taring && !this->done) {
+    } else if (!this->taring && !this->done) {
         if (this->scale->getReactionCompensatedLatestWeight() * 1000 >= (float)(this->target_mg)) {
             this->grinding = false;
             this->done = true;

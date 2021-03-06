@@ -119,7 +119,7 @@ void ScaleWrapper::refresh() {
     this->averageRateOfChange = sum/this->previousRatesOfChange->size();
     this->reactionCompensatedLatestWeight =
             this->convert(this->latestValueLongAverage.measuringPoint)
-            + this->averageRateOfChange * ((float)this->settings->getReactionTime()/1000. + 0.5);
+            + this->averageRateOfChange * ((float)this->settings->getReactionTime()/1000.);
 
     /*
     Serial.print("Latest: ");
