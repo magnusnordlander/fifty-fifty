@@ -7,14 +7,15 @@
 
 #include <U8g2lib.h>
 #include <NavigationController.h>
+#include "ButtonEvent.h"
 
 class BaseViewController {
 public:
     virtual void render(U8G2 display);
     virtual void handleRotation(int encoderDiff);
-    virtual void handleButtonState(bool state);
+    virtual void handleButtonEvent(ButtonEvent event);
 
-    virtual void tick();
+    virtual void tick(U8G2 display);
 
     virtual void viewWillBePushed(NavigationController *);
     virtual void viewWasPushed(NavigationController *);
@@ -28,6 +29,8 @@ public:
     virtual ~BaseViewController() = default;
 protected:
     NavigationController* navigationController;
+
+    void redraw(U8G2 display);
 };
 
 

@@ -7,9 +7,19 @@
 
 #include <FlashAsEEPROM.h>
 
+typedef struct {
+    bool valid;
+    unsigned short grindTargetTime;
+    unsigned short purgeTargetTime;
+    unsigned short grindTargetWeight;
+    unsigned short productivity;
+    float scaleCalibration;
+    unsigned short reactionTime;
+} SettingsStorageStruct;
+
 class Settings {
 public:
-    explicit Settings(EEPROMClass *eeprom);
+    explicit Settings();
 
     unsigned short getProductivity() const;
     void setProductivity(unsigned short productivity);
@@ -23,19 +33,22 @@ public:
     unsigned short getGrindTargetWeight() const;
     void setGrindTargetWeight(unsigned short grindTargetWeight);
 
+    float getScaleCalibration() const;
+    void setScaleCalibration(float scaleCalibration);
+
+    unsigned short getReactionTime() const;
+    void setReactionTime(unsigned short reactionTime);
+
     void commitToEEPROM();
 private:
-    unsigned short readUShort(unsigned short addr1, unsigned short addr2, unsigned short sanity, unsigned short fallback);
-    void stageUShort(unsigned short addr1, unsigned short addr2, unsigned short value);
-
-    EEPROMClass* eeprom;
-
     unsigned short productivity; // milligrams per second
     unsigned short purgeTargetTime; // milliseconds
     unsigned short grindTargetTime; // milliseconds
     unsigned short grindTargetWeight; // milligrams
+    float scaleCalibration; // unitless
+    unsigned short reactionTime; // milliseconds
 
-    bool hasChanges = false;
+    SettingsStorageStruct savedStorage;
 };
 
 
