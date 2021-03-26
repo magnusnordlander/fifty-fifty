@@ -2,9 +2,18 @@
 A grinder controller for my Mazzer Major
 
 ## Status
-This project is in use and development. Current PCB Revision is Revision B.
+This project is in use and development. Current PCB Revision is Rev C.
 
-*There will be both a Rev C and a Rev D PCB*. The Rev B PCB works, but it needs a trace cut (or the R2 resistor not soldered). The Rev C PCB will address this. The Rev D PCB will adjust the fit for a Futurekit FB20 box (it's currently slightly too large, and the mounting holes are misaligned). 
+*There will be a Rev D PCB*. The Rev D PCB will adjust the fit for a Futurekit FB20 box (it's currently slightly too large, and the mounting holes are misaligned). 
+
+### Changelog
+
+* Rev A: First revision board
+* Rev B: Substantial changes. ADS1232 load cell interface, SMT components, fully populated UEXT connector (was printed).
+  * Errata: Resistor R2 never should have existed. Remove R2 or cut trace from R2 to GND.
+  * Errata: R3 and R4 silk screens are flipped around. They're the same value though, so it doesn't make any material difference.
+* Rev C: Removed the resistor that was R2 in Rev B (hasn't been printed), fixed silk screen, added dots for SMT ICs.
+  * Errata: Doesn't quite fit in the intended Futurekit FB20 box.
 
 ## Overview
 
