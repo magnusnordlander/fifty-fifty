@@ -7,11 +7,15 @@
 
 #include "ViewControllers/BaseViewController.h"
 #include <SsrState.h>
+#include <Model/Settings.h>
+#include <ScaleWrapper.h>
 #include <types.h>
+#include <vector>
+#include "Model/GrindSession.h"
 
 class BaseGrindViewController: public BaseViewController {
 public:
-    explicit BaseGrindViewController(SsrState *ssr);
+    explicit BaseGrindViewController(SsrState *ssr, Settings* settings, ScaleWrapper* scale);
 
     void render(U8G2 display) override;
 
@@ -25,12 +29,20 @@ public:
 
     void setTemporaryTarget(millitime_t target);
 
+    virtual GrindType getGrindType();
+
+    static void initShared();
+
 protected:
+    Settings* settings;
+    ScaleWrapper* scale;
     SsrState* ssr;
     millitime_t startTime;
+    millitime_t stopTime;
     millitime_t elapsedMillis() const;
-    millitime_t temporary_target = 0;
+    unsigned long temporary_target = 0;
     bool grinding = false;
+    millitime_t lastMP = 0;
 };
 
 

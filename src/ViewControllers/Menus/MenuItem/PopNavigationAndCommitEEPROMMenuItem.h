@@ -6,7 +6,7 @@
 #define GRINDER_POPNAVIGATIONANDCOMMITEEPROMMENUITEM_H
 
 #include "PopNavigationMenuItem.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 
 class PopNavigationAndCommitEEPROMMenuItem: public PopNavigationMenuItem {
 public:

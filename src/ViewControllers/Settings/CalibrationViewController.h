@@ -6,7 +6,7 @@
 #define GRINDER_CALIBRATIONVIEWCONTROLLER_H
 
 #include <ViewControllers/BaseViewController.h>
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ScaleWrapper.h>
 #include <View/ProgressBarView.h>
 

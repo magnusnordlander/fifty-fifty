@@ -3,6 +3,7 @@
 CMakeListsPrivate.txt
 cmake-build-*/ 
 .idea
+src/secrets.h
 pcb/artifacts/
 # Temporary files
 *.000
@@ -25,3 +26,4 @@ fp-info-cache
 # Autorouter files (exported from Pcbnew)
 *.dsn
 *.ses
+

@@ -5,6 +5,8 @@
 #ifndef GRINDER_TYPES_H
 #define GRINDER_TYPES_H
 
+#include <cstdint>
+
 typedef unsigned long microtime_t;
 typedef unsigned long millitime_t;
 typedef struct {
@@ -15,5 +17,12 @@ typedef struct {
     microtime_t tick;
     microtime_t loop;
 } TimingStruct;
+
+typedef struct {
+    int32_t measuringPoint;
+    microtime_t microtime;
+} MeasuringPoint;
+
+enum GrindType { manual, purge, grindByTime, grindByWeight };
 
 #endif //GRINDER_TYPES_H

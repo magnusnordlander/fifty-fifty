@@ -6,7 +6,7 @@
 #define GRINDER_BASESETTINGVIEWCONTROLLER_H
 
 #include "ViewControllers/BaseViewController.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 
 class BaseSettingViewController: public BaseViewController {
 public:

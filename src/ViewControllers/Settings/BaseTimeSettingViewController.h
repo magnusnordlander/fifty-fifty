@@ -7,7 +7,7 @@
 
 #include "ViewControllers/BaseViewController.h"
 #include "BaseSettingViewController.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <NavigationController.h>
 
 class BaseTimeSettingViewController: public BaseSettingViewController {

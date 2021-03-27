@@ -6,7 +6,7 @@
 #define GRINDER_TEMPORARYGRAVIMETRICGRINDTARGETVIEWCONTROLLER_H
 
 #include <ViewControllers/BaseViewController.h>
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/GravimetricGrindViewController.h>
 #include "BaseTemporaryGrindTargetViewController.h"
 

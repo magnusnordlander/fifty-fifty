@@ -6,7 +6,7 @@
 #define GRINDER_GRINDBYWEIGHTMENUITEM_H
 
 #include "ViewControllerMenuItem.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/GravimetricGrindViewController.h>
 
 class GrindByWeightMenuItem: public ViewControllerMenuItem {

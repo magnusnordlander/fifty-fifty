@@ -7,9 +7,7 @@
 #include <Utils/TextUtils.h>
 
 GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, ScaleWrapper *scale,
-                                                               Settings *settings) : BaseGrindViewController(ssr) {
-    this->scale = scale;
-    this->settings = settings;
+                                                               Settings *settings) : BaseGrindViewController(ssr, settings, scale) {
     this->progressBar = new ProgressBarView;
 }
 
@@ -38,6 +36,12 @@ void GravimetricGrindViewController::tick(U8G2 display) {
         if (this->scale->getReactionCompensatedLatestWeight() * 1000 >= (float)(this->target_mg)) {
             this->grinding = false;
             this->done = true;
+        }
+    }
+
+    if (this->done) {
+        if (this->scale->getLatestWeightShortAverage() < -200.) {
+            this->navigationController->pop();
         }
     }
 }
@@ -126,4 +130,8 @@ void GravimetricGrindViewController::handleButtonEvent(ButtonEvent event) {
     if (event == BUTTON_LET_UP) {
         this->navigationController->pop();
     }
+}
+
+GrindType GravimetricGrindViewController::getGrindType() {
+    return grindByWeight;
 }

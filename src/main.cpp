@@ -14,6 +14,7 @@
 #include "ViewControllers/Settings/ProductivitySettingViewController.h"
 #include "ViewControllers/Settings/CalibrationViewController.h"
 #include "ViewControllers/Settings/PerformanceDebugViewController.h"
+#include "ViewControllers/Settings/WifiDebugViewController.h"
 #include "ViewControllers/Grinding/PurgeViewController.h"
 #include "ViewControllers/Grinding/TimedGrindViewController.h"
 #include "ViewControllers/ScaleViewController.h"
@@ -22,10 +23,14 @@
 #include "ViewControllers/Menus/MenuItem/PurgeMenuItem.h"
 #include "ViewControllers/Menus/MenuItem/GrindMenuItem.h"
 #include "ViewControllers/Menus/MenuItem/GrindByWeightMenuItem.h"
-#include "Settings.h"
+#include "Model/Settings.h"
 #include "ScaleWrapper.h"
 #include "ViewControllers/ButtonEvent.h"
 #include <types.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include "secrets.h"
+#include "Utils/SessionSender.h"
 
 // DT and CLK must be interrupt pins
 #define ENCODER_SW_PIN 4
@@ -54,6 +59,8 @@
 #define UEXT_I2C_SCL_PIN 19
 #define UEXT_I2C_SDA_PIN 18
 
+#define DEBUG
+
 #define SCROLL_DIRECTION 1
 // Use I2C SCL as SSD1309 DC and I2C SDA as SSD1309 RES
 U8G2_SSD1309_128X64_NONAME0_F_4W_HW_SPI u8g2(U8G2_R2, UEXT_SPI_CS_PIN, UEXT_I2C_SCL_PIN, UEXT_I2C_SDA_PIN);
@@ -77,17 +84,24 @@ NavigationController* nav = nullptr;
 
 TimingStruct timings;
 
+char ssid[] = SSID;        // your network SSID (name)
+char pass[] = PASS;    // your network password (use for WPA, or use as key for WEP)
+int status = WL_IDLE_STATUS;     // the WiFi radio's status
+
 void setup(void) {
+    #ifdef DEBUG
+        Serial.begin(115200);
+    #endif
+
+    if (WiFiDrv::wifiSetPassphrase(ssid, strlen(ssid), pass, strlen(pass)) == WL_FAILURE) {
+        Serial.println("Failed to set Wifi Passphrase somehow");
+    }
+
     pinMode(MANUAL_GRIND_PIN, INPUT_PULLUP);
     pinMode(ENCODER_SW_PIN, INPUT_PULLUP);
 
+    u8g2.setBusClock(8000000);
     u8g2.begin();
-
-/*
-    delay(5000);
-    Serial.begin(9600);
-    Serial.println("Starting");
-    */
 
     ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
@@ -106,7 +120,7 @@ void setup(void) {
 
     scale = ScaleWrapper::GetInstance(ADS1232_DOUT_PIN, ADS1232_SCLK_PIN, ADS1232_PWDN_PIN, settings);
 
-    manualGrindView = new ManualGrindViewController(ssr);
+    manualGrindView = new ManualGrindViewController(ssr, settings, scale);
 
     auto settingsMenu = new MenuViewController(std::vector<MenuItem*> {{
             new ViewControllerMenuItem("Purge time", new PurgeTimeSettingViewController(settings)),
@@ -117,18 +131,22 @@ void setup(void) {
             new ViewControllerMenuItem("Calibrate (100 g)", new CalibrationViewController(settings, scale)),
             new ViewControllerMenuItem("Scale debug", new ScaleDebugViewController(scale)),
             new ViewControllerMenuItem("Performance debug", new PerformanceDebugViewController()),
+            new ViewControllerMenuItem("WiFi debug", new WifiDebugViewController()),
             new PopNavigationAndCommitEEPROMMenuItem("Back", settings)
     }});
 
     auto mainMenu = new MenuViewController(std::vector<MenuItem*> {{
-            new PurgeMenuItem(new PurgeViewController(ssr, settings), settings),
-            new GrindMenuItem(new TimedGrindViewController(ssr, settings), settings),
+            new PurgeMenuItem(new PurgeViewController(ssr, settings, scale), settings),
+            new GrindMenuItem(new TimedGrindViewController(ssr, settings, scale), settings),
             new GrindByWeightMenuItem(new GravimetricGrindViewController(ssr, scale, settings), settings),
             new ViewControllerMenuItem("Scale", new ScaleViewController(scale)),
             new ViewControllerMenuItem("Settings...", settingsMenu),
     }});
 
     nav = new NavigationController(mainMenu);
+
+    initSessionSender();
+    BaseGrindViewController::initShared();
 }
 
 void updateExternalState() {
@@ -136,9 +154,6 @@ void updateExternalState() {
     long new_encoder_position = myEnc.read();
     if (new_encoder_position != Old_Encoder_Position) {
         Encoder_Diff = (new_encoder_position/4 - Old_Encoder_Position/4);
-        #ifdef DEBUG_RIG
-        //Serial.println(Encoder_Diff);
-        #endif
         Old_Encoder_Position = new_encoder_position;
     }
 
@@ -195,6 +210,8 @@ void loop(void) {
     nav->top()->tick(u8g2);
 
     microtime_t end = micros();
+
+    status = WiFiDrv::getConnectionStatus();
 
     timings = (TimingStruct){
         .external = manualStart - externalStart,

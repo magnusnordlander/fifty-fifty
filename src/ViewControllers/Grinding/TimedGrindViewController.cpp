@@ -30,8 +30,8 @@ void TimedGrindViewController::viewWillBePopped(NavigationController *controller
     this->target_ms = 0;
 }
 
-TimedGrindViewController::TimedGrindViewController(SsrState *ssr, Settings *settings) : BaseGrindViewController(ssr),
-                                                                              settings(settings) {}
+TimedGrindViewController::TimedGrindViewController(SsrState *ssr, Settings *settings, ScaleWrapper* scale) : BaseGrindViewController(ssr, settings, scale) {}
+
 void TimedGrindViewController::render(U8G2 display) {
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
     display.setFontMode(1);
@@ -44,4 +44,8 @@ void TimedGrindViewController::render(U8G2 display) {
     unsigned short remaining_ms = this->target_ms - elapsed_ms;
 
     drawLargeFloatWithUnits(display, (float)(remaining_ms)/1000, "s", 32, 3, 2);
+}
+
+GrindType TimedGrindViewController::getGrindType() {
+    return grindByTime;
 }

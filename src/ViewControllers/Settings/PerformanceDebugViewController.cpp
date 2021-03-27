@@ -5,11 +5,12 @@
 #include <types.h>
 #include <avr/dtostrf.h>
 #include "PerformanceDebugViewController.h"
+#include "Utils/freemem.h"
 
 extern TimingStruct timings;
 
 void PerformanceDebugViewController::render(U8G2 display) {
-    display.setFont(u8g2_font_ncenB08_tr);
+    display.setFont(u8g2_font_5x8_tr);
 
     char full[32];
     char num[10];
@@ -26,17 +27,16 @@ void PerformanceDebugViewController::render(U8G2 display) {
     snprintf(full, sizeof(full), "Manual: %s ms", num);
     display.drawStr(0,26, full);
 
-    dtostrf((float)timings.rotation/1000., 3, 2, num);
-    snprintf(full, sizeof(full), "Rot: %s ms", num);
-    display.drawStr(0,35, full);
-
     dtostrf((float)timings.button/1000., 3, 2, num);
     snprintf(full, sizeof(full), "Button: %s ms", num);
-    display.drawStr(0,44, full);
+    display.drawStr(0,35, full);
 
     dtostrf((float)timings.tick/1000., 3, 2, num);
     snprintf(full, sizeof(full), "Tick: %s ms", num);
-    display.drawStr(0,53, full);
+    display.drawStr(0,44, full);
+
+    snprintf(full, sizeof(full), "Mem: %d", freeMemory());
+    display.drawStr(0,54, full);
 }
 
 void PerformanceDebugViewController::handleButtonEvent(ButtonEvent event) {

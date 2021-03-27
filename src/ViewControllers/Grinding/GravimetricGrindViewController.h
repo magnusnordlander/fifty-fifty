@@ -6,7 +6,7 @@
 #define GRINDER_GRAVIMETRICGRINDVIEWCONTROLLER_H
 
 #include "BaseGrindViewController.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ScaleWrapper.h>
 #include <View/ProgressBarView.h>
 
@@ -27,14 +27,14 @@ public:
 
     virtual ~GravimetricGrindViewController();
 
+    GrindType getGrindType() override;
+
 private:
     void renderGrindingView(U8G2 display);
     void renderTaringView(U8G2 display);
 
     void startTare();
 
-    Settings* settings;
-    ScaleWrapper* scale;
     ProgressBarView* progressBar;
 
     bool taring = false;

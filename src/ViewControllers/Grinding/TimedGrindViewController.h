@@ -6,12 +6,12 @@
 #define GRINDER_TIMEDGRINDVIEWCONTROLLER_H
 
 #include "BaseGrindViewController.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <types.h>
 
 class TimedGrindViewController: public BaseGrindViewController {
 public:
-    TimedGrindViewController(SsrState *ssr, Settings *settings);
+    TimedGrindViewController(SsrState *ssr, Settings *settings, ScaleWrapper* scale);
 
     void tick(U8G2 display) override;
 
@@ -21,9 +21,9 @@ public:
 
     void render(U8G2 display) override;
 
-protected:
-    Settings* settings;
+    GrindType getGrindType() override;
 
+protected:
     millitime_t target_ms = 0;
 };
 

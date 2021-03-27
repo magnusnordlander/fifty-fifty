@@ -6,8 +6,7 @@
 #define GRINDER_SCALEWRAPPER_H
 
 #include <deque>
-#include <HX711_ADC.h>
-#include "Settings.h"
+#include "Model/Settings.h"
 #include <types.h>
 
 #define SPEED 80
@@ -16,11 +15,6 @@
 
 
 class ScaleDebugViewController;
-
-typedef struct {
-    int32_t measuringPoint;
-    microtime_t microtime;
-} MeasuringPoint;
 
 class ScaleWrapper {
 protected:
@@ -44,8 +38,14 @@ public:
     float getRateOfChange();
 
     float getReactionCompensatedLatestWeight() const;
+    MeasuringPoint getLatestMeasuringPoint();
 
     static void dataReadyISR();
+
+    int32_t tareValue = 0;
+    MeasuringPoint averagePointSince(microtime_t relMicros, unsigned short num);
+    MeasuringPoint latestAverage(unsigned short num);
+
 private:
     Settings* settings;
 
@@ -57,9 +57,8 @@ private:
 
     int32_t averageLast(microtime_t relMicros);
     MeasuringPoint firstValueSince(microtime_t relMicros);
+
     MeasuringPoint averagePointSince(microtime_t relMicros);
-    MeasuringPoint averagePointSince(microtime_t relMicros, unsigned short num);
-    MeasuringPoint latestAverage(unsigned short num);
     float _getRateOfChange();
     float _getLatestValue();
     float _getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);
@@ -70,7 +69,6 @@ private:
     MeasuringPoint min();
     MeasuringPoint max();
 
-    int32_t tareValue = 0;
     float calibrationValue = 0;
 
     MeasuringPoint safeData[LATEST_VALUE_SIZE];

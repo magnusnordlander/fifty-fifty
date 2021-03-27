@@ -6,7 +6,7 @@
 #define GRINDER_GRINDMENUITEM_H
 
 #include "ViewControllerMenuItem.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/TimedGrindViewController.h>
 
 class GrindMenuItem: public ViewControllerMenuItem {

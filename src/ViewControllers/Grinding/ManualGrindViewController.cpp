@@ -17,3 +17,7 @@ void ManualGrindViewController::render(U8G2 display) {
 
     drawLargeFloatWithUnits(display, (float)elapsed_ms/1000., "s", 32, 3, 2);
 }
+
+GrindType ManualGrindViewController::getGrindType() {
+    return manual;
+}

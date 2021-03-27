@@ -5,7 +5,7 @@
 #include "ScaleDebugViewController.h"
 
 void ScaleDebugViewController::render(U8G2 display) {
-    display.setFont(u8g2_font_ncenB08_tr);
+    display.setFont(u8g2_font_5x8_tr);
 
     char full[32];
     char num[10];

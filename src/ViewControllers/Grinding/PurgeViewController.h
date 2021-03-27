@@ -6,12 +6,12 @@
 #define GRINDER_PURGEVIEWCONTROLLER_H
 
 #include "BaseGrindViewController.h"
-#include "Settings.h"
+#include "Model/Settings.h"
 #include <types.h>
 
 class PurgeViewController: public BaseGrindViewController {
 public:
-    PurgeViewController(SsrState *ssr, Settings *settings);
+    PurgeViewController(SsrState *ssr, Settings *settings, ScaleWrapper* scale);
 
     void tick(U8G2 display) override;
 
@@ -20,9 +20,9 @@ public:
 
     void render(U8G2 display) override;
 
-protected:
-    Settings* settings;
+    GrindType getGrindType() override;
 
+protected:
     microtime_t target_ms = 0;
 };
 

@@ -6,7 +6,7 @@
 #define GRINDER_PURGEMENUITEM_H
 
 #include "ViewControllerMenuItem.h"
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/PurgeViewController.h>
 
 class PurgeMenuItem: public ViewControllerMenuItem {

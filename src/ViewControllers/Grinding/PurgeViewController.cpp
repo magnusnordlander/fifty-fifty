@@ -29,8 +29,8 @@ void PurgeViewController::viewWillBePopped(NavigationController *controller) {
     this->target_ms = 0;
 }
 
-PurgeViewController::PurgeViewController(SsrState *ssr, Settings *settings) : BaseGrindViewController(ssr),
-                                                                              settings(settings) {}
+PurgeViewController::PurgeViewController(SsrState *ssr, Settings *settings, ScaleWrapper* scale) : BaseGrindViewController(ssr, settings, scale) {}
+
 void PurgeViewController::render(U8G2 display) {
               // clear the internal memory
     display.setFont(u8g2_font_ncenB08_tr); // choose a suitable font
@@ -44,4 +44,8 @@ void PurgeViewController::render(U8G2 display) {
     unsigned short remaining_ms = this->target_ms - elapsed_ms;
 
     drawLargeFloatWithUnits(display, (float)(remaining_ms)/1000, "s", 32, 3, 2);
+}
+
+GrindType PurgeViewController::getGrindType() {
+    return purge;
 }

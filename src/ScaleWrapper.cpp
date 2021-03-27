@@ -161,6 +161,10 @@ float ScaleWrapper::_getLatestValue() {
     return this->convert(this->latestAverage(SPEED/10).measuringPoint);
 }
 
+MeasuringPoint ScaleWrapper::getLatestMeasuringPoint() {
+    return latestValues->front();
+}
+
 float ScaleWrapper::getRateOfChange() {
     return rateOfChange;
 }

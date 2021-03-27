@@ -6,7 +6,7 @@
 #define GRINDER_BASETEMPORARYGRINDTARGETVIEWCONTROLLER_H
 
 #include <ViewControllers/BaseViewController.h>
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/PurgeViewController.h>
 
 

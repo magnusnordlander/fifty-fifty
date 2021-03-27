@@ -13,6 +13,8 @@ class ManualGrindViewController: public BaseGrindViewController {
 public:
     using BaseGrindViewController::BaseGrindViewController;
 
+    GrindType getGrindType() override;
+
     void render(U8G2 display) override;
 };
 

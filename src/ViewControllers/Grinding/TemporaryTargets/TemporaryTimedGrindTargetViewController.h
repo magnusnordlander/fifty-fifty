@@ -6,7 +6,7 @@
 #define GRINDER_TEMPORARYTIMEDGRINDTARGETVIEWCONTROLLER_H
 
 #include <ViewControllers/BaseViewController.h>
-#include <Settings.h>
+#include <Model/Settings.h>
 #include <ViewControllers/Grinding/TimedGrindViewController.h>
 #include "BaseTemporaryGrindTargetViewController.h"
 
