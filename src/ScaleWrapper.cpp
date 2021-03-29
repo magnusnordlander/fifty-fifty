@@ -40,6 +40,14 @@ ScaleWrapper::ScaleWrapper(pin_size_t doutPin, pin_size_t clkPin, pin_size_t pdw
     this->calibrationValue = settings->getScaleCalibration();
     this->latestValues = new std::deque<MeasuringPoint>;
 
+    this->latestValue = (MeasuringPoint){.measuringPoint = 0, .microtime = 0};
+    this->latestValueShortAverage = (MeasuringPoint){.measuringPoint = 0, .microtime = 0};
+    this->latestValueLongAverage = (MeasuringPoint){.measuringPoint = 0, .microtime = 0};
+    this->rateOfChange = 0;
+    this->averageRateOfChange = 0;
+    this->previousRatesOfChange = new std::deque<float>;
+    this->reactionCompensatedLatestWeight = 0;
+
     this->init();
 
     attachInterrupt(digitalPinToInterrupt(doutPin), dataReadyISR, FALLING);
@@ -92,6 +100,42 @@ void ScaleWrapper::refresh() {
 
     latestRefreshed = this->latestValues->front().microtime;
 
+    this->latestValue = this->latestValues->front();
+
+    this->latestValueShortAverage = this->averagePointSince(50000);
+    this->latestValueLongAverage = this->averagePointSince(1000000);
+
+    this->rateOfChange = this->_getRateOfChange();
+    this->previousRatesOfChange->push_front(this->rateOfChange);
+
+    if (this->previousRatesOfChange->size() > RATE_OF_CHANGE_HISTORY) {
+        this->previousRatesOfChange->pop_back();
+    }
+
+    double sum = 0;
+    for (float i : *this->previousRatesOfChange) {
+        sum += i;
+    }
+    this->averageRateOfChange = sum/this->previousRatesOfChange->size();
+    this->reactionCompensatedLatestWeight =
+            this->convert(this->latestValueLongAverage.measuringPoint)
+            + this->averageRateOfChange * ((float)this->settings->getReactionTime()/1000.);
+
+    /*
+    Serial.print("Latest: ");
+    Serial.print(this->latestValue.measuringPoint);
+    Serial.print(" Short avg: ");
+    Serial.print(this->latestValueShortAverage.measuringPoint);
+    Serial.print(" Long avg: ");
+    Serial.print(this->latestValueLongAverage.measuringPoint);
+    Serial.print(" ROC: ");
+    Serial.print(this->rateOfChange);
+    Serial.print(" Avg ROC: ");
+    Serial.print(this->averageRateOfChange);
+    Serial.print(" Reaction: ");
+    Serial.println(this->reactionCompensatedLatestWeight);
+*/
+
     if (this->tareValue == 0 && this->isValueStableHighAccuracy()) {
         this->tare(1000000);
     }
@@ -101,15 +145,27 @@ void ScaleWrapper::tare(microtime_t rel_micros) {
     this->tareValue = averageLast(rel_micros);
 }
 
-float ScaleWrapper::getLatestValue() {
+float ScaleWrapper::getLatestWeight() {
+    return this->convert(this->latestValue.measuringPoint);
+}
+
+float ScaleWrapper::getLatestWeightShortAverage() {
+    return this->convert(this->latestValueShortAverage.measuringPoint);
+}
+
+float ScaleWrapper::getLatestWeightLongAverage() {
+    return this->convert(this->latestValueLongAverage.measuringPoint);
+}
+
+float ScaleWrapper::_getLatestValue() {
     return this->convert(this->latestAverage(SPEED/10).measuringPoint);
 }
 
-float ScaleWrapper::getLatestValue(microtime_t relMicros) {
-    return this->convert(this->averageLast(relMicros));
+float ScaleWrapper::getRateOfChange() {
+    return rateOfChange;
 }
 
-float ScaleWrapper::getRateOfChange() {
+float ScaleWrapper::_getRateOfChange() {
     if (this->latestValues->size() < 2) {
         return 0.;
     }
@@ -120,14 +176,18 @@ float ScaleWrapper::getRateOfChange() {
     microtime_t diff = last.microtime - first.microtime;
 
     float weightDiff = this->convert(last.measuringPoint) - this->convert(first.measuringPoint);
-    auto timeDiff = (float)((double)diff / 1000000.);
+    auto timeDiff = (float)((double)diff/1000000);
 
     return weightDiff / timeDiff;
 }
 
-float ScaleWrapper::getReactionCompensatedLatestValue(unsigned short reactionTimeMillis) {
-    float rateOfChange = this->getRateOfChange();
-    float latestValue = this->getLatestValue();
+float ScaleWrapper::getReactionCompensatedLatestWeight() const {
+    return reactionCompensatedLatestWeight;
+}
+
+float ScaleWrapper::_getReactionCompensatedLatestValue(unsigned short reactionTimeMillis) {
+    float rateOfChange = this->_getRateOfChange();
+    float latestValue = this->_getLatestValue();
 
     if (rateOfChange < 0.01) {
         return latestValue;
@@ -279,6 +339,37 @@ MeasuringPoint ScaleWrapper::firstValueSince(microtime_t relMicros) {
     return latestValues->back();
 }
 
+MeasuringPoint ScaleWrapper::averagePointSince(microtime_t relMicros) {
+    microtime_t current = micros();
+
+    int32_t sum = 0;
+    unsigned short foundNum = 0;
+    microtime_t lastTime = 0;
+
+    if (latestValues->empty()) {
+        return (MeasuringPoint){.measuringPoint = 0, .microtime = 0};
+    }
+
+    if (latestValues->size() == 1) {
+        return latestValues->back();
+    }
+
+    for (int i = latestValues->size() - 1; i >= 0; i--) {
+        MeasuringPoint p = latestValues->at(i);
+        if (current - p.microtime <= relMicros) {
+            foundNum++;
+            sum += p.measuringPoint;
+            lastTime = p.microtime;
+        }
+    }
+
+    if (foundNum == 0) {
+        return latestValues->back();
+    }
+
+    return MeasuringPoint{.measuringPoint=sum/foundNum, .microtime=lastTime};
+}
+
 MeasuringPoint ScaleWrapper::averagePointSince(microtime_t relMicros, unsigned short num) {
     microtime_t current = micros();
 
@@ -286,7 +377,15 @@ MeasuringPoint ScaleWrapper::averagePointSince(microtime_t relMicros, unsigned s
     unsigned short foundNum = 0;
     microtime_t lastTime = 0;
 
-    for (unsigned int i = latestValues->size() - 1; i >= 0; i--) {
+    if (latestValues->empty()) {
+        return (MeasuringPoint){.measuringPoint = 0, .microtime = 0};
+    }
+
+    if (latestValues->size() == 1) {
+        return latestValues->back();
+    }
+
+    for (int i = latestValues->size() - 1; i >= 0; i--) {
         MeasuringPoint p = latestValues->at(i);
         if (current - p.microtime <= relMicros) {
             foundNum++;

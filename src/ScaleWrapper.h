@@ -12,6 +12,7 @@
 
 #define SPEED 80
 #define LATEST_VALUE_SIZE 400
+#define RATE_OF_CHANGE_HISTORY 10
 
 
 class ScaleDebugViewController;
@@ -37,11 +38,12 @@ public:
 
     bool isValueStableHighAccuracy();
     bool isValueStableLowAccuracy();
-    float getLatestValue();
-    float getLatestValue(microtime_t relMicros);
+    float getLatestWeight();
+    float getLatestWeightShortAverage();
+    float getLatestWeightLongAverage();
     float getRateOfChange();
 
-    float getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);
+    float getReactionCompensatedLatestWeight() const;
 
     static void dataReadyISR();
 private:
@@ -55,8 +57,12 @@ private:
 
     int32_t averageLast(microtime_t relMicros);
     MeasuringPoint firstValueSince(microtime_t relMicros);
+    MeasuringPoint averagePointSince(microtime_t relMicros);
     MeasuringPoint averagePointSince(microtime_t relMicros, unsigned short num);
     MeasuringPoint latestAverage(unsigned short num);
+    float _getRateOfChange();
+    float _getLatestValue();
+    float _getReactionCompensatedLatestValue(unsigned short reactionTimeMillis);
 
     float scaleStandardDeviation(microtime_t relMicros, unsigned short minValues);
     bool isValueStable(microtime_t relMicros, unsigned short minValues, uint32_t sigma);
@@ -74,6 +80,15 @@ private:
     microtime_t latestRefreshed = 0;
 
     std::deque<MeasuringPoint>* latestValues;
+
+    MeasuringPoint latestValue;
+    MeasuringPoint latestValueShortAverage;
+    MeasuringPoint latestValueLongAverage;
+    float reactionCompensatedLatestWeight;
+
+    float rateOfChange;
+    float averageRateOfChange;
+    std::deque<float>* previousRatesOfChange;
 
     friend class ScaleDebugViewController;
 };

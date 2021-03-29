@@ -45,7 +45,7 @@ void ScaleViewController::tick(U8G2 display) {
         this->taring = false;
     }
 
-    float latest = this->scale->getLatestValue();
+    float latest = this->scale->getLatestWeightShortAverage();
 
     if (tickCounter++ % 16 == 0 || fabs(latest - displayValue) > 0.2) {
         displayValue = latest;

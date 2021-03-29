@@ -16,14 +16,14 @@ GravimetricGrindViewController::GravimetricGrindViewController(SsrState *ssr, Sc
 void GravimetricGrindViewController::tick(U8G2 display) {
     BaseGrindViewController::tick(display);
 
-    float latestWeight = this->scale->getLatestValue();
+    float latestWeight = this->scale->getLatestWeightLongAverage();
     float latestRoc = this->scale->getRateOfChange();
 
-    if (tickCounter % 16 == 0 || fabs(latestWeight - displayValue) > .4) {
+    if (tickCounter % 4 == 0 || fabs(latestWeight - displayValue) > .4) {
         displayValue = latestWeight;
     }
 
-    if (tickCounter % 16 == 0 || fabs(latestRoc - displayRoc) > 0.2) {
+    if (tickCounter % 4 == 0 || fabs(latestRoc - displayRoc) > 0.2) {
         displayRoc = latestRoc;
     }
 
@@ -34,10 +34,8 @@ void GravimetricGrindViewController::tick(U8G2 display) {
         this->scale->tare(2000000);
         this->taring = false;
         this->grinding = true;
-    }
-
-    if (!this->taring && !this->done) {
-        if (this->scale->getReactionCompensatedLatestValue(this->reaction_time)*1000 >= (float)(this->target_mg)) {
+    } else if (!this->taring && !this->done) {
+        if (this->scale->getReactionCompensatedLatestWeight() * 1000 >= (float)(this->target_mg)) {
             this->grinding = false;
             this->done = true;
         }

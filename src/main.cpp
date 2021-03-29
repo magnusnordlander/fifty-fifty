@@ -83,9 +83,11 @@ void setup(void) {
 
     u8g2.begin();
 
-    #ifdef DEBUG_RIG
-    //Serial.begin(9600);
-    #endif
+/*
+    delay(5000);
+    Serial.begin(9600);
+    Serial.println("Starting");
+    */
 
     ssr = new SsrState(SSR_PIN);
     auto settings = new Settings();
