@@ -1,6 +1,10 @@
 # fifty-fifty
 A grinder controller for my Mazzer Major
 
+![Photo of the debug rig](https://raw.githubusercontent.com/magnusnordlander/fifty-fifty/main/docs/debug-rig.jpeg)
+
+![Photo of the modded grinder](https://raw.githubusercontent.com/magnusnordlander/fifty-fifty/main/docs/grinder.jpeg)
+
 ## Status
 This project is in use and development. Current PCB Revision is Rev C.
 
