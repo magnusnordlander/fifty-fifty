@@ -368,7 +368,7 @@ MeasuringPoint ScaleWrapper::averagePointSince(microtime_t relMicros) {
     }
 
     if (foundNum == 0) {
-        return latestValues->back();
+        return latestValues->front();
     }
 
     return MeasuringPoint{.measuringPoint=sum/foundNum, .microtime=lastTime};
