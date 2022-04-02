@@ -40,6 +40,10 @@ void GravimetricGrindViewController::tick(U8G2 display) {
             this->done = true;
         }
     }
+
+    if (this->done && this->scale->getLatestWeightShortAverage() < -200.) {
+        this->navigationController->pop();
+    }
 }
 
 void GravimetricGrindViewController::viewWasPushed(NavigationController *controller) {
